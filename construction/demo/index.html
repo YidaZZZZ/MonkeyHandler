@@ -65,7 +65,7 @@
   <nav id="nav" hidden>
     <button data-go="today" id="tab-today">今日训练</button>
     <button data-go="plan">20 天总览</button>
-    <button data-go="why">为什么（意图）</button>
+    <button data-go="why">关于计划</button>
     <button class="ghost" id="reset">重置</button>
   </nav>
 </header>
@@ -91,7 +91,7 @@ const EX = {
   "deadbug": {n:"死虫式", t:2, dur:"6 次 ×2/侧", cue:"腰贴地，对侧手脚缓慢伸展再收回。", why:"抗伸展核心稳定，对腰背友好（通用常识）。"},
   "birddog": {n:"鸟狗式", t:2, dur:"6 次 ×2/侧", cue:"四足位，腰保持中立，手脚同起同落。", why:"抗旋转稳定与髋背协调（通用常识）。"},
   "plank":   {n:"跪姿平板", t:3, dur:"20-30 秒 ×2", cue:"肩腕垂直，收腹，塌腰即停。", why:"前链核心耐力，低负荷起步（通用常识）。"},
-  "sidebr":  {n:"跪姿侧桥", t:3, dur:"15 秒 ×2/侧", cue:"肘膝支撑，髋部抬起与身体成一线。", why:"侧腹链耐力；侧弯方向的个性化强化需专业评估，demo 对称练习（通用常识）。"},
+  "sidebr":  {n:"跪姿侧桥", t:3, dur:"15 秒 ×2/侧", cue:"肘膝支撑，髋部抬起与身体成一线。", why:"侧腹链耐力；方向性的强化需要专业评估后个性化，这里做对称练习（通用常识）。"},
   "ham":     {n:"腘绳肌拉伸", t:2, dur:"45 秒/侧", cue:"微屈膝前屈，酸胀可忍、不痛。", why:"释放骨盆后链张力（通用常识）。"},
   "hip":     {n:"屈髋肌拉伸", t:2, dur:"45 秒/侧", cue:"弓步，收腹收臀再前移。", why:"改善久坐屈髋张力（通用常识）。"},
   "thor":    {n:"四足胸椎旋转", t:2, dur:"8 次 ×2/侧", cue:"手扶头，肘去找对侧手腕。", why:"胸椎旋转活动度（拉伸面）（通用常识）。"},
@@ -196,7 +196,7 @@ function insightPanelHTML(){
       <p class="muted">完成 ${es.length}/20 · 连续 ${streakCount()} 次 · 疼痛最高 ${painMax}/10${painMax>=4?"（安全锁定中）":""} · 缺席 ${S.prog.missed.length} 次</p>`;
   }
   return `<div class="card"><h2>你的提升痕迹</h2>${body}
-    <p class="muted" style="font-size:13px">爽必须真实——以上全部来自你的打卡数据（本地迭代：数据只留在本机，为的是让你的下一期更准）。</p></div>`;
+    <p class="muted" style="font-size:13px">以上全部来自你的打卡数据，只保存在这台设备上。</p></div>`;
 }
 /* 完成反馈含义化：完成反馈优先呈现「这意味着什么提升」（philosophy §三.2） */
 function interpretResult(d){
@@ -208,7 +208,7 @@ function interpretResult(d){
   if(dr <= -2) return `RPE ${r.rpe-dr} → ${r.rpe}：明显更轻松——恢复跟上来了，明天按心流通道微调难度。`;
   if(dr === -1) return `RPE ${r.rpe+1} → ${r.rpe}：稍微轻松了一点——方向是对的。`;
   if(dr === 0)  return `RPE 稳定在 ${r.rpe}：同负荷同感受，基础在巩固。`;
-  return `RPE ${r.rpe-dr} → ${r.rpe}：比上次吃力。先查可控因素（睡眠/压力/动作质量），系统明天会自动降档——不是你的问题（works/meditations：可控性归属）。`;
+  return `RPE ${r.rpe-dr} → ${r.rpe}：比上次吃力。先查可控因素（睡眠/压力/动作质量），系统明天会自动帮你降一点难度——不是你的问题。`;
 }
 
 /* ---------------- 渲染 ---------------- */
@@ -218,7 +218,7 @@ function render(){
   if(!S){ renderOnboard(); return; }
   $banners.innerHTML = "";
   if(S.profile.assessed === "no"){
-    $banners.innerHTML += `<div class="banner warn">你尚未做过专业评估。脊柱侧弯的专向训练（如施罗斯疗法）需要专业评估与认证指导；本 demo 只提供通用的对称运动与拉伸常识。建议先就医评估。</div>`;
+    $banners.innerHTML += `<div class="banner warn">你尚未做过专业评估。脊柱侧弯的专向训练（如施罗斯疗法）需要专业评估与认证指导；这里只安排通用的对称运动与拉伸常识。建议先就医评估。</div>`;
   }
   if(everHighPain()){
     $banners.innerHTML += `<div class="banner dan">你的训练记录中出现过疼痛 ≥4。按安全规则，计划已停止递进并保持恢复版强度；建议就医评估后再继续。</div>`;
@@ -230,13 +230,13 @@ function render(){
 
 function renderOnboard(){
   const qs = [
-    {k:"assessed", q:"是否已由医院/专业机构评估过脊柱侧弯（方向、程度）？", why:"决定安全横幅与是否提示就医；个性化强化必须以评估为前提。"},
-    {k:"pain", q:"目前的背部疼痛情况？", why:"安全变量：疼痛史影响横幅与递进锁定。", opts:[["no","基本无疼痛"],["some","偶发酸痛"],["often","经常疼痛"]]},
-    {k:"time", q:"每天能稳定投入多少分钟？", why:"决定每天的内容量（tier 裁剪）——最小提问：只问会改变计划的。", opts:[["10","10 分钟"],["15","15 分钟"],["20","20 分钟"],["30","30 分钟"]]},
-    {k:"sleep", q:"平均每晚睡眠？", why:"恢复预算硬规则的输入：睡眠不足 → 强度上限下调。", opts:[["<6","少于 6 小时"],["6-7","6–7 小时"],["7-8","7–8 小时"],["8+","8 小时以上"]]},
-    {k:"stress", q:"近期生活压力？", why:"恢复预算硬规则的输入。", opts:[["low","低"],["mid","中"],["high","高"]]},
-    {k:"level", q:"规律运动基础？", why:"起始强度。", opts:[["none","基本没有"],["some","有一些"]]},
-    {k:"style", q:"什么最让你把一件事坚持下去？", why:"决定激励文案的取向（d_motivation_orientation）。", opts:[["progress","看得见的进步"],["streak","连续打卡记录"],["social","同伴与陪伴"],["competition","和自己竞赛"]]}
+    {k:"assessed", q:"是否已由医院/专业机构评估过脊柱侧弯（方向、程度）？", why:"未评估的话，我们会持续提醒你先就医评估，并且只安排通用练习。"},
+    {k:"pain", q:"目前的背部疼痛情况？", why:"疼痛记录会触发保护规则。", opts:[["no","基本无疼痛"],["some","偶发酸痛"],["often","经常疼痛"]]},
+    {k:"time", q:"每天能稳定投入多少分钟？", why:"计划会按这个时长安排每天的内容量。", opts:[["10","10 分钟"],["15","15 分钟"],["20","20 分钟"],["30","30 分钟"]]},
+    {k:"sleep", q:"平均每晚睡眠？", why:"睡得少的日子，计划会自动变轻。", opts:[["<6","少于 6 小时"],["6-7","6–7 小时"],["7-8","7–8 小时"],["8+","8 小时以上"]]},
+    {k:"stress", q:"近期生活压力？", why:"压力大的时候，计划会自动变轻。", opts:[["low","低"],["mid","中"],["high","高"]]},
+    {k:"level", q:"规律运动基础？", why:"决定从多轻开始。", opts:[["none","基本没有"],["some","有一些"]]},
+    {k:"style", q:"什么最让你把一件事坚持下去？", why:"用来挑选适合你的鼓励方式。", opts:[["progress","看得见的进步"],["streak","连续打卡记录"],["social","同伴与陪伴"],["competition","和自己竞赛"]]}
   ];
   let html = `<h1>开始之前：了解你这一个人</h1>
     <p class="muted">7 个问题，每个都对应一个会因此不同的决策（最小提问原则）。答案只存在你的浏览器里。</p>
@@ -287,17 +287,17 @@ function renderToday(){
   let list, note = "";
   if(fallbackMode && !isDone(d)){
     list = exListHTML(FALLBACK.map(f=>f.id), true);
-    note = `<div class="banner warn">昨天缺席——今天自动回落到<b>两分钟启动版</b>（不补课、不惩罚）。做完就算完成，保护出勤链。<br>依据：两分钟规则（works/atomic-habits）· 失败恢复成本 F11。</div>`;
+    note = `<div class="banner warn">昨天缺席——今天自动回落到<b>两分钟启动版</b>（不补课、不惩罚）。做完就算完成，先回来，再继续。</div>`;
   } else if(recovery){
     const ids = day.ex.filter(id => EX[id].t === 1);
     list = exListHTML(ids, false);
     note = locked
-      ? `<div class="banner dan"><b>安全锁定中</b>：出现过疼痛 ≥4 → 只保留基础项，停止递进；建议就医评估后再恢复完整训练（works/why-we-sleep · 疼痛≠酸痛）。</div>`
-      : `<div class="banner warn"><b>今日为恢复版</b>：睡眠不足或压力高 → 恢复预算硬规则下调强度上限（recovery_budget），只保留基础项。这不是偷懒，是计划的一部分。</div>`;
+      ? `<div class="banner dan"><b>安全锁定中</b>：出现过疼痛 ≥4 → 只保留基础动作，停止加量；建议就医评估后再恢复完整训练。</div>`
+      : `<div class="banner warn"><b>今日为轻量版</b>：睡眠不足或压力大的时候，计划会自动变轻——只保留基础动作。这不是偷懒，是计划的一部分。</div>`;
   } else {
     const ids = day.ex.filter(id => EX[id].t <= tm);
     list = exListHTML(ids, false);
-    if(ids.length < day.ex.length) note = `<p class="muted">按你的 ${S.profile.time} 分钟预算，今天保留 ${ids.length}/${day.ex.length} 项（tier 裁剪）。</p>`;
+    if(ids.length < day.ex.length) note = `<p class="muted">按你的 ${S.profile.time} 分钟预算，今天安排了其中的 ${ids.length} 项。</p>`;
   }
   const style = S.profile.style;
   const hook = HOOKS[style][d % HOOKS[style].length];
@@ -379,22 +379,19 @@ function renderPlan(){
 
 function renderWhy(){
   $app.innerHTML = `
-    <h1>为什么是这个样子（意图基线 · demo 版）</h1>
-    <div class="card"><h2>产品理念</h2>
-      <p>让用户提升的爽、一直提升——<b>上瘾对象是提升本身，不是机制</b>（construction/philosophy.md）。本页的排序规则、硬规则与整个首屏的「提升痕迹」面板，全部服务于此。</p></div>
-    <div class="card"><h2>排序规则</h2>
-      <p>安全（专业边界/疼痛） &gt; G1 长期依从 &gt; G2 掌握真实 &gt; 操作效率 &gt; 视觉美观</p>
-      <p class="muted">冲突时按此排序取舍；每条取舍应有 ADR 记录「被牺牲的东西」（construction/intent）。</p></div>
-    <div class="card"><h2>硬规则（代码强制）</h2>
-      <p><b>恢复预算</b>：睡眠 &lt;6h 或高压力 → 强度上限 0.5，当日只保留基础项（同 core/humanity.py 的 recovery_budget）。</p>
-      <p><b>疼痛锁定</b>：check-in 疼痛 ≥4 → 停止递进 + 就医建议。</p></div>
-    <div class="card"><h2>设计原则（挂著作出处）</h2>
-      <p>两分钟启动与缺席回落（atomic-habits）· 即时记录（flow/atomic-habits · Harkin 2016）· 难度缓坡（peak/fitness 渐进）· 心流通道约 85% 成功率（flow，可校准启发式）· 证据链画像（框架纪律）· 动机文案按自报取向选型（d_motivation_orientation）。</p></div>
-    <div class="card"><h2>常识边界（识域不设构筑策略）</h2>
-      <p>练习内容为<b>通用对称性运动与拉伸常识</b>；每个练习的「为什么」都标注了这一点。专向方法（如施罗斯）需要专业调研与认证指导——真实系统将由调研引擎（M2）补齐，并逐主张给出处。</p></div>
-    <div class="card"><h2>对「这一个人」的个性化（当前画像）</h2>
-      <p class="muted">${Object.entries(S.profile).map(([k,v]) => `${k} = ${v}`).join(" · ")}</p>
-      <p class="muted">这些字段分别改变：内容量（tier 裁剪）、强度（恢复预算）、横幅（评估/疼痛）、文案（动机取向）。换一组答案，计划就不一样——这就是 CUP-6 验收线在 demo 里的样子。</p></div>`;
+    <h1>关于这个计划</h1>
+    <p class="muted">这个平台只有一个目标：让你清楚地看见自己在一天天变强。</p>
+    <div class="card"><h2>它是怎么设计的</h2>
+      <p>20 天分三个阶段：<b>先适应、再稳定、后巩固</b>。每个动作都为「让脊柱在日常姿势里更有支撑」服务；强度按周缓慢递增，最后一周主动减量——变强发生在恢复里，不在硬撑里。</p>
+      <p class="muted">每个动作旁边都可以点开「为什么练这个」。练习内容为通用运动常识，不构成医疗处方。</p></div>
+    <div class="card"><h2>保护规则</h2>
+      <p><b>自动轻量</b>：睡眠不足或压力大的时候，计划自动变轻——恢复和训练一样重要。</p>
+      <p><b>疼痛就停</b>：疼痛达到 4 分及以上，计划停止加量并建议就医。疼痛和酸痛是两回事。</p>
+      <p><b>缺席不惩罚</b>：中断后第二天自动回到两分钟版本——先回来，再继续。</p></div>
+    <div class="card"><h2>你的数据</h2>
+      <p>所有打卡记录只保存在这台设备上，用来让下一期计划更贴合你；想重新开始，随时点右上角「重置」一键删除。</p></div>
+    <div class="card"><h2>边界</h2>
+      <p>脊柱侧弯的专向训练（如施罗斯疗法）需要专业评估与认证指导。这个计划只提供通用的对称练习——如果还没做过评估，请先就医。</p></div>`;
 }
 
 /* ---------------- 事件 ---------------- */

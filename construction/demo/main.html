@@ -62,15 +62,13 @@
   <nav>
     <button class="tab" data-v="over">提升总览</button>
     <button class="tab" data-v="inst">我的训练平台</button>
-    <button class="tab" data-v="grow">平台的成长</button>
+    <button class="tab" data-v="grow">越来越懂你</button>
     <button class="open" id="openInst">打开训练平台 →</button>
   </nav>
 </header>
 <main id="app"></main>
 <footer>
-  主平台 = 呈现与生产（本页）：呈现你的提升轨迹与平台的生产成长，并基于需求生成训练平台（阶段性产物）。
-  主平台与产物平台共用同一套三层结构，主目标侧重不同——主平台呈现以提升轨迹与生产成长为主导（construction/philosophy.md §三）。
-  所有数据仅存本机（本地迭代：数据不出本机，为的是让你的下一期更准）。
+  MonkeyHandler 主平台 · 你的所有训练数据只保存在这台设备上，用于让你的下一期训练更贴合你。
 </footer>
 
 <script>
@@ -135,7 +133,7 @@ function viewOver(){
   const noEval = S && S.profile && S.profile.assessed === "no";
   const hero = `
     <h1>提升总览</h1>
-    <p class="sub">跨训练平台汇总 · 上瘾对象是提升本身——所以主平台的第一屏是你的提升，而非待办（construction/philosophy.md §三）。</p>
+    <p class="sub">你所有训练平台的提升，都汇集在这里。</p>
     <div class="card">
       <div class="stats">
         <div class="stat"><b>${done}</b><span>累计完成训练</span></div>
@@ -146,9 +144,9 @@ function viewOver(){
       ${es.length >= 2 ? sparkline(es) : ""}
       <p>${trendSentence(es)}</p>
       ${pain!==null && pain>=4 ? `<div class="banner warn">记录中出现疼痛 ≥4：训练平台已触发安全锁定（停止递进）。建议就医评估后再继续——这比任何进度都重要。</div>` : ""}
-      <p class="muted small">爽必须真实：以上全部来自你的打卡数据 · 本地迭代（数据只留在本机，为的是让你的下一期更准）。</p>
+      <p class="muted small">以上全部来自你的打卡数据，只保存在这台设备上。</p>
     </div>
-    ${noEval ? `<div class="banner warn">你的训练平台显示尚未做过专业评估：脊柱侧弯的专向训练（如施罗斯疗法）需要专业评估与认证指导。主平台将持续呈现这一约束，直到评估完成。</div>` : ""}
+    ${noEval ? `<div class="banner warn">你的训练平台显示尚未做过专业评估：脊柱侧弯的专向训练（如施罗斯疗法）需要专业评估与认证指导——评估完成前，训练平台只安排通用练习。</div>` : ""}
     ${done === 0 ? `<div class="banner note">你还没有训练数据——打开下方任一训练平台，完成第一次训练，这里就会开始生长你的提升轨迹。</div>` : ""}`;
   return hero + footerNote();
 }
@@ -162,7 +160,7 @@ function viewInst(){
   }
   return `
     <h1>我的训练平台</h1>
-    <p class="sub">训练计划平台是<b>阶段性产物</b>：在用户手中、基于其训练需求由主平台生成；运行数据回流主平台（数据飞轮）。</p>
+    <p class="sub">每个训练平台都为你的一个具体目标而生——练完、归档，你的数据让下一次更贴合你。</p>
     <div class="card inst">
       <div class="info">
         <div class="name">🏋 20 天脊柱侧弯运动与拉伸 <span class="chip">${active ? "进行中 · 第 " + day + " 天" : (doneN>=20 ? "已完成" : "未开始")}</span></div>
@@ -173,49 +171,35 @@ function viewInst(){
     </div>
     <div class="gen">
       <h2 style="margin-top:0">＋ 基于新需求，生成一个新的训练平台</h2>
-      <p class="muted small">生产能力（M1+ 实装）按构筑体系执行——每一步的方法论与约束来自 humanity/ 著作库与本仓库构筑层：</p>
+      <p class="muted small">生成一个专属训练平台的过程（能力建设中）：</p>
       <div class="steps">
-        <div class="step"><b>① 需求与画像</b><br>结构化问卷 → 对「这一个人」的带证据画像（最小提问原则）</div>
-        <div class="step"><b>② 意图层</b><br>逆向设计：能力证据 → 评估 → 活动；排序规则与硬规则装配（CWI）</div>
-        <div class="step"><b>③ 细节层</b><br>S/R/C/ST + 事件五种结果 + 反馈规格（CWD，含视觉呈现方法论）</div>
-        <div class="step"><b>④ demo 交付</b><br>主流程纵向切片 + 质量门禁验收，数据回流主平台</div>
+        <div class="step"><b>① 说出目标</b><br>用一句话描述你想达成的改变</div>
+        <div class="step"><b>② 回答几个问题</b><br>只问会影响计划的问题：时间、睡眠、疼痛、什么最能让你坚持</div>
+        <div class="step"><b>③ 得到专属平台</b><br>每天的内容、强度与鼓励方式都为你调整</div>
+        <div class="step"><b>④ 越用越懂你</b><br>你的打卡让下一期更贴合你的身体与生活</div>
       </div>
-      <p class="muted small">当前 demo 阶段：生成能力尚未实装——需要新的训练平台时，由构筑流程人工/协作产出（见 construction/README）。</p>
+      <p class="muted small">当前为演示：生成能力正在建设中——现在可以先体验「20 天脊柱侧弯」这个训练平台。</p>
     </div>` + footerNote();
 }
 function viewGrow(){
   return `
-    <h1>平台的成长（数据飞轮）</h1>
-    <p class="sub">MonkeyHandler 随用户数据积累而越来越有效——这是它与「某个训练计划」的区别。</p>
+    <h1>为什么它会越来越懂你</h1>
+    <p class="sub">这不是一个固定的训练模板——它被设计为随着你的使用而成长。</p>
     <div class="card">
-      <h2>知识资产（呈现层）</h2>
-      <p>
-        <span class="chip">著作候选 44 本</span><span class="chip">已走完流水线 36 本</span>
-        <span class="chip">提取文件 144+</span><span class="chip">人性内核 15 条</span>
-        <span class="chip dim">硬规则 1（恢复预算）</span><span class="chip dim">synthesis 草稿：因素网/工作流/Prompt 库</span>
-      </p>
-      <p class="muted small">著作库流水线：总结 → 逐主张验证（争议不入库）→ 提取提示词与方法论 → 用户审核 → 综合。</p>
+      <h2>你的每一次打卡，都在训练「它」</h2>
+      <p>昨天睡得少，今天就轻一点；连续缺席，第二天只要求两分钟；同样的动作变轻松了，难度就悄悄往上调。这些调整围绕你的恢复、感受与进步持续发生。</p>
     </div>
     <div class="card">
-      <h2>飞轮（实现形态：本地迭代）</h2>
-      <div class="fly">
-        <div><b>实例</b><br><span class="muted small">训练平台在你的手中运行</span></div>
-        <div>→</div>
-        <div><b>执行数据</b><br><span class="muted small">check-in · 行为 · 疼痛（本机）</span></div>
-        <div>→</div>
-        <div><b>元平台修正</b><br><span class="muted small">画像 · 置信度 · 难度校准</span></div>
-        <div>→</div>
-        <div><b>更准的下一期</b><br><span class="muted small">同一个你，更有效的计划</span></div>
-      </div>
-      <p class="muted small">实现形态已定（2026-09-29）：个体级回流、本地优先——数据不出本机；跨用户沉淀留作远期方向。</p>
+      <h2>方法有出处</h2>
+      <p>计划背后的练习与原则来自经过验证的运动科学与行为研究，并有专门的审核流程——<b>没有出处的方法，不会进入你的计划</b>。</p>
     </div>
     <div class="card">
-      <h2>构筑体系（生产能力的来源）</h2>
-      <p class="small">意图层（CWI）→ 细节层（CWD）→ demo；「对用户的个性化了解」（CUP）并行构筑；产品理念：让用户对「自我提升」上瘾——上瘾对象是提升本身（construction/philosophy.md）。</p>
+      <h2>数据属于你</h2>
+      <p>所有记录只保存在这台设备上；它们只有一个用途：让你的下一期训练更贴合你。想重新开始，随时一键删除。</p>
     </div>` + footerNote();
 }
 function footerNote(){
-  return `<div class="card"><p class="muted small"><b>定位</b>：训练计划平台是阶段性产物——因需求而生、随目标完成而归档；本主平台呈现与生产，长期演进。主平台与产物平台共用三层结构（价值观/意图/细节），主目标侧重不同。</p></div>`;
+  return `<div class="card"><p class="muted small">训练计划平台为你的具体目标而生，完成后自动归档；这个主平台则长期陪伴——呈现你的提升，并让每一次训练都更懂你。</p></div>`;
 }
 
 document.querySelector("nav").addEventListener("click", e => {
