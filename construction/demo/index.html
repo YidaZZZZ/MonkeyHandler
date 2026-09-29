@@ -163,6 +163,51 @@ function currentDay(){
 }
 function phaseOf(d){ return PHASES.find(p => d >= p.days[0] && d <= p.days[1]); }
 function everHighPain(){ return Object.values(S.prog.days).some(r => r.done && r.pain >= 4); }
+function completedEntries(){
+  return PLAN.map(p => ({d: p.d, r: S.prog.days[p.d]})).filter(x => x.r && x.r.done);
+}
+function rpeTrendBars(){
+  return completedEntries().map(x =>
+    `<span class="pnum ${x.r.rpe<=4?"low":(x.r.rpe>=7?"high":"")}" title="第 ${x.d} 天 RPE ${x.r.rpe}">${x.r.rpe}</span>`
+  ).join(" ");
+}
+function streakCount(){
+  let n = 0;
+  for(let d = currentDay()-1; d >= 1; d--){ if(isDone(d)) n++; else break; }
+  return n;
+}
+/* 首屏定律：打开任何界面，第一眼看到的是提升痕迹，不是待办清单（construction/philosophy.md §三） */
+function insightPanelHTML(){
+  const es = completedEntries();
+  let body;
+  if(!es.length){
+    body = `<p>还没有记录——完成今天的训练，这里会出现你的<b>第一条提升曲线</b>。</p>
+      <p class="muted">爽必须真实：我们不展示假数据。</p>`;
+  } else {
+    const first = es[0], last = es[es.length-1];
+    const trend = es.length === 1
+      ? `第 ${first.d} 天 RPE ${first.r.rpe} 已存——这是你的<b>基线</b>，下一次打卡起，这里会显示你变强的轨迹。`
+      : `RPE 轨迹 ${first.r.rpe} → ${last.r.rpe}${last.r.rpe < first.r.rpe ? "：<b>同样的练习更轻松了——你在变强。</b>" : (last.r.rpe > first.r.rpe ? "：近期更吃力——系统会按恢复预算自动校准难度，这不是你的问题。" : "：稳定巩固中。")}`;
+    const painMax = Math.max(...es.map(x => x.r.pain));
+    body = `<p>${trend}</p>
+      <p>${rpeTrendBars()}</p>
+      <p class="muted">完成 ${es.length}/20 · 连续 ${streakCount()} 次 · 疼痛最高 ${painMax}/10${painMax>=4?"（安全锁定中）":""} · 缺席 ${S.prog.missed.length} 次</p>`;
+  }
+  return `<div class="card"><h2>你的提升痕迹</h2>${body}
+    <p class="muted" style="font-size:13px">爽必须真实——以上全部来自你的打卡数据（本地迭代：数据只留在本机，为的是让你的下一期更准）。</p></div>`;
+}
+/* 完成反馈含义化：完成反馈优先呈现「这意味着什么提升」（philosophy §三.2） */
+function interpretResult(d){
+  const r = S.prog.days[d];
+  if(r.pain >= 4) return "疼痛 ≥4：安全锁定已触发，计划已停止递进——先就医评估，这比任何进度都重要。";
+  const prevs = completedEntries().filter(x => x.d < d);
+  if(!prevs.length) return "这是你的第一条记录——它就是你的基线。下一次打卡起，这里会告诉你：你是在变强，还是在恢复。";
+  const dr = r.rpe - prevs[prevs.length-1].r.rpe;
+  if(dr <= -2) return `RPE ${r.rpe-dr} → ${r.rpe}：明显更轻松——恢复跟上来了，明天按心流通道微调难度。`;
+  if(dr === -1) return `RPE ${r.rpe+1} → ${r.rpe}：稍微轻松了一点——方向是对的。`;
+  if(dr === 0)  return `RPE 稳定在 ${r.rpe}：同负荷同感受，基础在巩固。`;
+  return `RPE ${r.rpe-dr} → ${r.rpe}：比上次吃力。先查可控因素（睡眠/压力/动作质量），系统明天会自动降档——不是你的问题（works/meditations：可控性归属）。`;
+}
 
 /* ---------------- 渲染 ---------------- */
 function render(){
@@ -258,6 +303,7 @@ function renderToday(){
   $app.innerHTML = `
     <h1>第 ${d} / 20 天 <span class="tag">${ph.name}</span><span class="tag">${day.focus}</span></h1>
     ${note || ""}
+    ${insightPanelHTML()}
     <div class="card">${list}</div>
     <div class="card">
       <h2>${done ? "今日已完成" : "完成后打卡"}</h2>
@@ -291,6 +337,8 @@ function doneCard(d){
   const style = S.profile.style;
   const hook = HOOKS[style][(d+1) % HOOKS[style].length];
   return `<div class="banner ok">完成 ✓　RPE ${r.rpe} · 疼痛 ${r.pain}${r.note ? " · 「" + r.note + "」" : ""}</div>
+    <p><b>${interpretResult(d)}</b></p>
+    <p>${rpeTrendBars()}</p>
     <p class="muted">✦ ${hook}</p>
     <p><button data-go="plan">看 20 天总览</button></p>`;
 }
@@ -330,6 +378,8 @@ function renderPlan(){
 function renderWhy(){
   $app.innerHTML = `
     <h1>为什么是这个样子（意图基线 · demo 版）</h1>
+    <div class="card"><h2>产品理念</h2>
+      <p>让用户提升的爽、一直提升——<b>上瘾对象是提升本身，不是机制</b>（construction/philosophy.md）。本页的排序规则、硬规则与整个首屏的「提升痕迹」面板，全部服务于此。</p></div>
     <div class="card"><h2>排序规则</h2>
       <p>安全（专业边界/疼痛） &gt; G1 长期依从 &gt; G2 掌握真实 &gt; 操作效率 &gt; 视觉美观</p>
       <p class="muted">冲突时按此排序取舍；每条取舍应有 ADR 记录「被牺牲的东西」（construction/intent）。</p></div>
