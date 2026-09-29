@@ -303,7 +303,6 @@ function renderToday(){
   $app.innerHTML = `
     <h1>第 ${d} / 20 天 <span class="tag">${ph.name}</span><span class="tag">${day.focus}</span></h1>
     ${note || ""}
-    ${insightPanelHTML()}
     <div class="card">${list}</div>
     <div class="card">
       <h2>${done ? "今日已完成" : "完成后打卡"}</h2>
@@ -314,7 +313,8 @@ function renderToday(){
       <p><button class="primary" id="done">提交打卡</button>
          <button class="ghost" id="skip">今天跳过（记为缺席）</button></p>
       <p class="muted">✦ ${hook}</p>`}
-    </div>`;
+    </div>
+    ${insightPanelHTML()}`;
   if(!done){
     document.getElementById("done").addEventListener("click", () => {
       const rpe = +document.getElementById("rpe").value;
