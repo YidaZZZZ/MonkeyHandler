@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MonkeyHandler 主平台 · 呈现与生产</title>
+<style>
+  :root{--bg:#f4f7f8;--card:#fff;--ink:#1d2a33;--muted:#5b6b76;--accent:#0f766e;--accent-2:#115e59;
+        --accent-soft:#e0f2f0;--warn-bg:#fef3c7;--warn-ink:#92400e;--ok:#166534;--ok-bg:#dcfce7;
+        --line:#dde5e9;--radius:14px;--gold:#b45309}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:16px/1.6 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+  header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:16px 22px;background:var(--card);
+         border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+  .brand{font-weight:800;font-size:17px;color:var(--accent)}
+  .brand small{color:var(--muted);font-weight:500;margin-left:8px;font-size:13px}
+  nav{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto;align-items:center}
+  button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--line);background:#fff;
+         color:var(--ink);padding:9px 16px;transition:background .15s}
+  button:hover{background:var(--accent-soft)}
+  button.tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+  button.open{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  button.open:hover{filter:brightness(1.08)}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  main{max-width:920px;margin:0 auto;padding:24px 18px 70px}
+  h1{font-size:26px;margin:10px 0 2px} h2{font-size:17px;margin:0 0 12px;color:var(--accent-2)}
+  .sub{color:var(--muted);margin:0 0 6px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin:16px 0}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin:14px 0}
+  .stat{background:linear-gradient(180deg,#fff, #f7fbfa);border:1px solid var(--line);border-radius:var(--radius);
+        padding:16px 18px;text-align:center}
+  .stat b{display:block;font-size:34px;line-height:1.15;color:var(--accent-2);font-variant-numeric:tabular-nums}
+  .stat span{color:var(--muted);font-size:13.5px}
+  .banner{border-radius:var(--radius);padding:12px 16px;margin:14px 0;font-size:14.5px}
+  .banner.note{background:var(--accent-soft);color:var(--accent-2)}
+  .banner.warn{background:var(--warn-bg);color:var(--warn-ink)}
+  .muted{color:var(--muted)} .small{font-size:13.5px}
+  .chip{display:inline-block;background:var(--accent-soft);color:var(--accent-2);border-radius:999px;
+        padding:2px 11px;font-size:13px;margin:2px 4px 2px 0}
+  .chip.dim{background:#eef2f4;color:var(--muted)}
+  .inst{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .inst .info{flex:1;min-width:220px}
+  .inst .name{font-weight:700;font-size:16.5px}
+  .bar{height:9px;background:var(--line);border-radius:999px;overflow:hidden;margin:8px 0 4px}
+  .bar>i{display:block;height:100%;background:var(--accent)}
+  .gen{border:2px dashed var(--line);border-radius:var(--radius);padding:20px 22px;margin:16px 0;background:transparent}
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:12px}
+  .step{background:var(--accent-soft);border-radius:10px;padding:10px 12px;font-size:14px}
+  .step b{color:var(--accent-2)}
+  svg.chart{width:100%;height:110px;display:block}
+  .fly{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;text-align:center;margin-top:10px}
+  .fly div{background:#f7fbfa;border:1px solid var(--line);border-radius:10px;padding:12px 10px;font-size:14px}
+  footer{max-width:920px;margin:0 auto;padding:18px;color:var(--muted);font-size:13px}
+  [hidden]{display:none !important}
+  @media (prefers-reduced-motion: reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+<header>
+  <span class="brand">MonkeyHandler<small>主平台 · 呈现与生产</small></span>
+  <nav>
+    <button class="tab" data-v="over">提升总览</button>
+    <button class="tab" data-v="inst">我的训练平台</button>
+    <button class="tab" data-v="grow">平台的成长</button>
+    <button class="open" id="openInst">打开训练平台 →</button>
+  </nav>
+</header>
+<main id="app"></main>
+<footer>
+  主平台 = 呈现与生产（本页）：呈现你的提升轨迹与平台的生产成长，并基于需求生成训练平台（阶段性产物）。
+  主平台与产物平台共用同一套三层结构，主目标侧重不同——主平台呈现以提升轨迹与生产成长为主导（construction/philosophy.md §三）。
+  所有数据仅存本机（本地迭代：数据不出本机，为的是让你的下一期更准）。
+</footer>
+
+<script>
+"use strict";
+/* 数据：与训练平台（index.html）共享同一 origin 的 localStorage（本地迭代） */
+const KEY = "mhDemoV1";
+let S = null;
+try { S = JSON.parse(localStorage.getItem(KEY) || "null"); } catch(e) {}
+let view = "over";
+
+function entries(){
+  if(!S || !S.prog) return [];
+  return [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+    .map(d => ({d, r: S.prog.days[d]})).filter(x => x.r && x.r.done);
+}
+function streak(){
+  if(!S || !S.prog) return 0;
+  let firstUndone = 21;
+  for(let d=1; d<=20; d++){ const r=S.prog.days[d]; if(!(r&&r.done)&&!S.prog.missed.includes(d)){ firstUndone=d; break; } }
+  let n=0; for(let d=firstUndone-1; d>=1; d--){ const r=S.prog.days[d]; if(r&&r.done) n++; else break; }
+  return n;
+}
+function sparkline(es){
+  if(es.length < 2) return "";
+  const w=560, h=96, pad=8;
+  const pts = es.map((x,i) => {
+    const x0 = pad + i*( (w-2*pad) / (es.length-1) );
+    const y0 = h - pad - ( (x.r.rpe-1) / 9 ) * (h-2*pad);
+    return [x0,y0];
+  });
+  const line = pts.map(p=>p.map(v=>v.toFixed(1)).join(",")).join(" ");
+  const dots = es.map((x,i) =>
+    `<circle cx="${pts[i][0].toFixed(1)}" cy="${pts[i][1].toFixed(1)}" r="4" fill="#0f766e">
+       <title>第 ${x.d} 天 RPE ${x.r.rpe}</title></circle>`).join("");
+  const label1 = `<text x="${pts[0][0]}" y="${h-1}" font-size="11" fill="#5b6b76">第1天 RPE ${es[0].r.rpe}</text>`;
+  const label2 = `<text x="${pts[pts.length-1][0]-52}" y="${h-1}" font-size="11" fill="#5b6b76">第${es[es.length-1].d}天 RPE ${es[es.length-1].r.rpe}</text>`;
+  return `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="RPE 轨迹：数值下降代表同样的练习更轻松">
+    <polyline points="${line}" fill="none" stroke="#0f766e" stroke-width="2.5" stroke-linejoin="round"/>${dots}${label1}${label2}</svg>`;
+}
+function trendSentence(es){
+  if(!es.length) return "完成第一次训练后，这里会出现你的第一条提升曲线。";
+  if(es.length === 1) return `第 ${es[0].d} 天 RPE ${es[0].r.rpe} 已存——这是你的基线。`;
+  const a = es[0].r.rpe, b = es[es.length-1].r.rpe;
+  if(b < a) return `同样的练习，RPE 从 ${a} 到 ${b}——<b>你在变强。</b>`;
+  if(b > a) return `近期 RPE 从 ${a} 到 ${b}——训练平台会按恢复预算自动校准难度。`;
+  return `RPE 稳定在 ${b}——基础巩固中。`;
+}
+function painMax(es){ return es.length ? Math.max(...es.map(x=>x.r.pain)) : null; }
+
+function render(){
+  document.querySelectorAll("nav .tab").forEach(b =>
+    b.classList.toggle("active", b.dataset.v === view));
+  const app = document.getElementById("app");
+  if(view === "over") app.innerHTML = viewOver();
+  else if(view === "inst") app.innerHTML = viewInst();
+  else app.innerHTML = viewGrow();
+}
+function viewOver(){
+  const es = entries();
+  const done = es.length;
+  const pain = painMax(es);
+  const noEval = S && S.profile && S.profile.assessed === "no";
+  const hero = `
+    <h1>提升总览</h1>
+    <p class="sub">跨训练平台汇总 · 上瘾对象是提升本身——所以主平台的第一屏是你的提升，而非待办（construction/philosophy.md §三）。</p>
+    <div class="card">
+      <div class="stats">
+        <div class="stat"><b>${done}</b><span>累计完成训练</span></div>
+        <div class="stat"><b>${streak()}</b><span>当前连续次数</span></div>
+        <div class="stat"><b>${pain===null?"—":pain}</b><span>疼痛最高（0-10）</span></div>
+        <div class="stat"><b>${S && S.prog ? S.prog.missed.length : 0}</b><span>缺席次数</span></div>
+      </div>
+      ${es.length >= 2 ? sparkline(es) : ""}
+      <p>${trendSentence(es)}</p>
+      ${pain!==null && pain>=4 ? `<div class="banner warn">记录中出现疼痛 ≥4：训练平台已触发安全锁定（停止递进）。建议就医评估后再继续——这比任何进度都重要。</div>` : ""}
+      <p class="muted small">爽必须真实：以上全部来自你的打卡数据 · 本地迭代（数据只留在本机，为的是让你的下一期更准）。</p>
+    </div>
+    ${noEval ? `<div class="banner warn">你的训练平台显示尚未做过专业评估：脊柱侧弯的专向训练（如施罗斯疗法）需要专业评估与认证指导。主平台将持续呈现这一约束，直到评估完成。</div>` : ""}
+    ${done === 0 ? `<div class="banner note">你还没有训练数据——打开下方任一训练平台，完成第一次训练，这里就会开始生长你的提升轨迹。</div>` : ""}`;
+  return hero + footerNote();
+}
+function viewInst(){
+  let day = "—", doneN = 0, percent = 0, active = false;
+  if(S && S.prog){
+    for(let d=1; d<=20; d++){ const r=S.prog.days[d]; if(r&&r.done) doneN++; }
+    percent = Math.round(doneN/20*100);
+    day = Math.min(20, doneN + 1 + S.prog.missed.filter(m=>m<=doneN+1).length);
+    active = doneN < 20;
+  }
+  return `
+    <h1>我的训练平台</h1>
+    <p class="sub">训练计划平台是<b>阶段性产物</b>：在用户手中、基于其训练需求由主平台生成；运行数据回流主平台（数据飞轮）。</p>
+    <div class="card inst">
+      <div class="info">
+        <div class="name">🏋 20 天脊柱侧弯运动与拉伸 <span class="chip">${active ? "进行中 · 第 " + day + " 天" : (doneN>=20 ? "已完成" : "未开始")}</span></div>
+        <div class="bar"><i style="width:${percent}%"></i></div>
+        <span class="muted small">完成 ${doneN}/20（${percent}%） · 目标：从运动和拉伸层面缓解脊柱侧弯</span>
+      </div>
+      <button class="open" id="openInst2">打开训练界面</button>
+    </div>
+    <div class="gen">
+      <h2 style="margin-top:0">＋ 基于新需求，生成一个新的训练平台</h2>
+      <p class="muted small">生产能力（M1+ 实装）按构筑体系执行——每一步的方法论与约束来自 humanity/ 著作库与本仓库构筑层：</p>
+      <div class="steps">
+        <div class="step"><b>① 需求与画像</b><br>结构化问卷 → 对「这一个人」的带证据画像（最小提问原则）</div>
+        <div class="step"><b>② 意图层</b><br>逆向设计：能力证据 → 评估 → 活动；排序规则与硬规则装配（CWI）</div>
+        <div class="step"><b>③ 细节层</b><br>S/R/C/ST + 事件五种结果 + 反馈规格（CWD，含视觉呈现方法论）</div>
+        <div class="step"><b>④ demo 交付</b><br>主流程纵向切片 + 质量门禁验收，数据回流主平台</div>
+      </div>
+      <p class="muted small">当前 demo 阶段：生成能力尚未实装——需要新的训练平台时，由构筑流程人工/协作产出（见 construction/README）。</p>
+    </div>` + footerNote();
+}
+function viewGrow(){
+  return `
+    <h1>平台的成长（数据飞轮）</h1>
+    <p class="sub">MonkeyHandler 随用户数据积累而越来越有效——这是它与「某个训练计划」的区别。</p>
+    <div class="card">
+      <h2>知识资产（呈现层）</h2>
+      <p>
+        <span class="chip">著作候选 44 本</span><span class="chip">已走完流水线 36 本</span>
+        <span class="chip">提取文件 144+</span><span class="chip">人性内核 15 条</span>
+        <span class="chip dim">硬规则 1（恢复预算）</span><span class="chip dim">synthesis 草稿：因素网/工作流/Prompt 库</span>
+      </p>
+      <p class="muted small">著作库流水线：总结 → 逐主张验证（争议不入库）→ 提取提示词与方法论 → 用户审核 → 综合。</p>
+    </div>
+    <div class="card">
+      <h2>飞轮（实现形态：本地迭代）</h2>
+      <div class="fly">
+        <div><b>实例</b><br><span class="muted small">训练平台在你的手中运行</span></div>
+        <div>→</div>
+        <div><b>执行数据</b><br><span class="muted small">check-in · 行为 · 疼痛（本机）</span></div>
+        <div>→</div>
+        <div><b>元平台修正</b><br><span class="muted small">画像 · 置信度 · 难度校准</span></div>
+        <div>→</div>
+        <div><b>更准的下一期</b><br><span class="muted small">同一个你，更有效的计划</span></div>
+      </div>
+      <p class="muted small">实现形态已定（2026-09-29）：个体级回流、本地优先——数据不出本机；跨用户沉淀留作远期方向。</p>
+    </div>
+    <div class="card">
+      <h2>构筑体系（生产能力的来源）</h2>
+      <p class="small">意图层（CWI）→ 细节层（CWD）→ demo；「对用户的个性化了解」（CUP）并行构筑；产品理念：让用户对「自我提升」上瘾——上瘾对象是提升本身（construction/philosophy.md）。</p>
+    </div>` + footerNote();
+}
+function footerNote(){
+  return `<div class="card"><p class="muted small"><b>定位</b>：训练计划平台是阶段性产物——因需求而生、随目标完成而归档；本主平台呈现与生产，长期演进。主平台与产物平台共用三层结构（价值观/意图/细节），主目标侧重不同。</p></div>`;
+}
+
+document.querySelector("nav").addEventListener("click", e => {
+  const b = e.target.closest("button.tab");
+  if(b){ view = b.dataset.v; render(); }
+});
+function openInst(){ location.href = "index.html"; }
+document.getElementById("openInst").addEventListener("click", openInst);
+document.addEventListener("click", e => { if(e.target.id === "openInst2") openInst(); });
+render();
+</script>
+</body>
+</html>
