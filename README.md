@@ -6,6 +6,16 @@ AI 驱动的**个体化学习/训练工作台**开源框架（Python）。
 
 市面上的训练计划普遍有两个盲区：**不懂人**——模板化计划无视个体的作息、精力曲线、动机类型与伤病史；**不懂领域**——计划背后的「为什么」不可见，常常偏离该领域真正有效的方法。结果大多数人中途放弃。MonkeyHandler 把解决方案拆成三个引擎 + 一个闭环，并把「对人本身的深刻理解」做成一等公民。
 
+## 定位：元平台，而不是某个训练计划
+
+MonkeyHandler 本体是一个**呈现与生产平台**：
+
+- **呈现**：沉淀并呈现关于人类的著作资产（humanity/）、构筑方法（construction/）与运营期提示词（synthesis/）；
+- **生产**：基于用户的训练需求，在其手中**生成**一个训练计划平台（实例）——例如针对「20 天从运动和拉伸层面缓解脊柱侧弯」生成的 demo；
+- **数据飞轮**：每个实例在运行中累积该用户的执行数据，回流修正元平台（画像模型、知识置信度、方法论验证），让下一次生产更有效。
+
+**训练计划平台是阶段性产物**：因需求而生、随目标完成而归档，其数据沉淀回元平台——MonkeyHandler 因此越用越有效。
+
 （English TL;DR: MonkeyHandler is a Python framework for building human-friendly, individualized training workbenches. It pairs a book-derived model of human nature — universal mechanisms plus individual-difference dimensions — with an evidence-based user profile, pluggable cited domain research, and motivation-aware plan generation with an execution feedback loop.）
 
 ## 三大能力 + 一个闭环

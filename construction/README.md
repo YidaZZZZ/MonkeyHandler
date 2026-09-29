@@ -30,7 +30,8 @@ construction/
 ## 与既有体系的关系
 
 - `humanity/synthesis/prompts/`（P-PRO/PLAN/MOT/REV/GOV）服务于**运营期**——系统面对用户时的工作方式；
-- 本目录的 P-INT/P-DTL/P-UPF 与工作流 CWI/CWD/CUP 服务于**构筑期**——我们建造平台时的工作方式；构筑期产出的意图基线、画像能力与规格，是运营期 prompt 的上游约束。
+- 本目录的 P-INT/P-DTL/P-UPF 与工作流 CWI/CWD/CUP 服务于**构筑期**——我们建造平台时的工作方式；构筑期产出的意图基线、画像能力与规格，是运营期 prompt 的上游约束；
+- 本目录构筑的是**元平台的生产能力**；训练计划平台（实例）是生产能力在具体需求上的展开——**阶段性产物**：因需求而生、随目标完成而归档，其执行数据回流元平台形成数据飞轮（见 docs/architecture.md §1.1）。
 
 ## 当前状态
 
@@ -39,4 +40,4 @@ construction/
 | profiling | 框架就绪；CUP-1/2 已有代码基础（core/profiling.py），CUP-3..6 待建 |
 | intent | 框架就绪；CWI-1 决策盘点（把 M0 决定补登记为基线）待启动 |
 | detail | 框架就绪；完整规格未写；**demo 已先行产出**（CWD-7 的初版切片，规格文档后续补） |
-| demo | ✅ 可运行（`demo/index.html`，浏览器直接打开） |
+| demo | ✅ 可运行（`demo/index.html`，浏览器直接打开）——**阶段性产物的实例样例**：针对「20 天缓解脊柱侧弯」这一具体需求由元平台生成 |
