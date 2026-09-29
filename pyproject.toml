@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "monkeyhandler"
+version = "0.0.1"
+description = "MonkeyHandler —— AI 驱动的个体化学习/训练工作台框架：识人、识域、成案、执行闭环"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "MonkeyHandler contributors" }]
+keywords = ["ai", "coaching", "training", "learning", "personalization", "fitness"]
+dependencies = [
+    "pydantic>=2.5",
+    "typer>=0.12",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+monkeyhandler = "monkeyhandler.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/monkeyhandler"]
