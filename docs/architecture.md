@@ -116,6 +116,7 @@ flowchart LR
 MonkeyHandler/
 ├── README.md
 ├── docs/                    # architecture.md / roadmap.md
+├── construction/            # 平台构筑：意图层（CWI）→ 细节层（CWD）→ demo；values/ 暂空占位
 ├── humanity/                # 人类通识知识库（著作库 + 综合层）
 │   ├── README.md            # 选书标准、流水线、格式规范、候选清单
 │   ├── works/<book>/        # work.md / summary.md / verification.md / prompts.md
