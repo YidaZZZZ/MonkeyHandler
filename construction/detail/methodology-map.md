@@ -39,7 +39,6 @@
 | --- | --- | --- |
 | 微文案不得替代真实结果（装饰性代理的反面） | understanding-comics、hamlet-on-the-holodeck | 文案层「真实文案」纪律 |
 | 反馈四段式、无羞辱表述 | design-of-everyday-things、works/motivation P-MOT-2/4（候选设计） | 错误类文案模板 |
-| 提问与倾听的语气（复述确认、不评判） | how-to-win-friends | 对话式界面（访谈/check-in）文案语气 |
 
 ## 视觉与动效
 
