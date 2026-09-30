@@ -1,7 +1,7 @@
 # 意图层：构筑指导 Prompt
 
 > 用途：**构筑期**——在设计平台功能时，把设计决策写成可评审、可证伪的意图。与 `humanity/synthesis/prompts/`（运营期）相互独立。
-> **状态：全部草稿·待审核。** prompt 引用的方法论以 [methodology-map.md](methodology-map.md) 为准。
+> **状态：全部草稿·已审核（2026-09-30 批准）。** prompt 引用的方法论以 [methodology-map.md](methodology-map.md) 为准。
 
 ## P-INT-1 意图登记
 

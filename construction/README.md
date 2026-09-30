@@ -28,7 +28,7 @@ construction/
 
 - 来源：`humanity/works/`（36 本著作 verification「入库」清单 + prompts 提取）与 `humanity/synthesis/`；
 - 归类标准：**指导意图（intent）/ 指导具体做法（detail）/ 指导理解用户（profiling）**——同一条方法论可以多目录出现（如「知行合一：行为证据优先」在 profiling 是证据纪律、在 intent 是原则依据）；
-- 所有映射为**草稿·待审核**；引用主张以对应 works verification「入库」清单为准。
+- 所有映射为**草稿·已审核（2026-09-30 批准）**；引用主张以对应 works verification「入库」清单为准。
 
 ## 与既有体系的关系
 
