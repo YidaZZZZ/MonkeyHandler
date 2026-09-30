@@ -75,6 +75,21 @@
   #crisisOv .box h2{color:var(--dan-ink)}
   textarea{font:inherit;padding:10px;border:1px solid var(--line);border-radius:9px;width:100%;min-height:84px;resize:vertical;background:#fff;color:var(--ink)}
 </style>
+<style id="ui-system">
+/* 细节层 token 修订（construction/ui-system.md）：4/8pt 间距网格 · 1.25 字阶 · 分层阴影 · 46rem 阅读行宽 · WCAG AA 对比 */
+:root{--shadow-1:0 1px 2px rgba(16,42,51,.05),0 3px 10px rgba(16,42,51,.06);
+      --shadow-2:0 2px 4px rgba(16,42,51,.06),0 10px 24px rgba(16,42,51,.10);--muted:#52616c}
+body{background:linear-gradient(180deg,#eef4f2 0%,var(--bg) 300px)}
+header{background:rgba(255,255,255,.85);backdrop-filter:blur(10px) saturate(1.15)}
+.card{box-shadow:var(--shadow-1);padding:24px 22px;transition:box-shadow .2s ease}
+.card:hover{box-shadow:var(--shadow-2)}
+h1{font-size:26px;letter-spacing:-.01em}
+h2{font-size:17.5px}
+.card p{max-width:46rem}
+.stat b{font-size:36px;font-variant-numeric:tabular-nums}
+button.primary{background:linear-gradient(180deg,#128077,#0f6e66);box-shadow:0 1px 2px rgba(15,118,110,.35)}
+button.open{background:linear-gradient(180deg,#128077,#0f6e66);box-shadow:0 1px 2px rgba(15,118,110,.35)}
+</style>
 </head>
 <body>
 <header>
