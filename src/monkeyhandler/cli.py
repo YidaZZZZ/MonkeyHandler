@@ -95,7 +95,7 @@ def generate(
             fg=typer.colors.RED,
         )
         raise typer.Exit(1)
-    llm = OpenAICompatClient(cfg["base"], cfg["key"], cfg["model"])
+    llm = OpenAICompatClient(cfg["base"], cfg["key"], cfg["model"], timeout=300, max_tokens=7800)
 
     answers = {
         "training_experience": level,

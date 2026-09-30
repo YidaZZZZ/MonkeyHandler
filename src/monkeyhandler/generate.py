@@ -88,11 +88,15 @@ class InstanceGenerator:
     )
 
     def _llm_spec(self, user: UserModel, goal: str, horizon: int, cap: float) -> InstanceSpec:
+        level = (user.text("training_experience", "none") or "none").strip().lower()
+        base = {"none": 0.5, "some": 0.65, "experienced": 0.75}.get(level, 0.5)
         base_prompt = (
             f"训练目标：{goal}\n\n用户画像：\n{user.summary()}\n\n硬约束：\n"
             f"- horizon_days 必须等于 {horizon}；days 数组从 day=1 连续编号到 {horizon}\n"
-            f"- intensity（起始强度 0-1）不得超过 {cap:.2f}（恢复预算硬规则）\n"
+            f"- intensity（起始强度 0-1）参考 {base:.2f}（按无经验水平），硬上限 {cap:.2f}（恢复预算）\n"
             f"- 每天一个训练日，含 3-6 个练习项（items），每项含 name/dur/cue/why\n"
+            f"- 输出长度纪律（防截断）：why 每项 ≤14 字且相邻天可重复；cue ≤18 字；focus ≤16 字；rationale ≤80 字\n"
+            f"- 语言纪律：所有字段用中文；phase 用中文命名（例：适应期/稳定期/巩固期）；dur 用中文格式（例：「30 秒 ×2/侧」「8 次 ×2」）\n"
             f"- 三阶段推进（适应→稳定→巩固），末段安排减量日；rationale 说明依据\n"
             f"- 安全：通用运动常识；不承诺治愈；不使用医疗断言\n\n"
             "输出 JSON 结构："
@@ -124,3 +128,7 @@ class InstanceGenerator:
         if spec.intensity > cap + 1e-9:
             spec.intensity = round(cap, 2)
             spec.safety.append("模型给出的强度超出了恢复保护上限，已自动调低")
+        for line in ("疼痛 ≥4：停止加量并就医评估", "通用运动常识，不构成医疗处方",
+                     "专向训练需专业评估（如施罗斯疗法）"):
+            if line not in spec.safety:
+                spec.safety.append(line)

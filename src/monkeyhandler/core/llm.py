@@ -65,12 +65,14 @@ class OpenAICompatClient:
     JSON 不合法时抛出 ValueError，由调用方决定降级或重试。
     """
 
-    def __init__(self, base_url: str, api_key: str, model: str, timeout: int = 90, temperature: float = 0.7):
+    def __init__(self, base_url: str, api_key: str, model: str, timeout: int = 300,
+                 temperature: float = 0.7, max_tokens: int | None = None):
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.model = model
         self.timeout = timeout
         self.temperature = temperature
+        self.max_tokens = max_tokens
 
     def complete_json(self, system: str, user: str, schema: type[T]) -> T:
         payload = _json.dumps({
@@ -80,6 +82,7 @@ class OpenAICompatClient:
                 {"role": "user", "content": user},
             ],
             "temperature": self.temperature,
+            **({"max_tokens": self.max_tokens} if self.max_tokens else {}),
         }).encode("utf-8")
         req = _request.Request(
             self.base_url + "/chat/completions",
