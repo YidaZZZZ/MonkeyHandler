@@ -68,6 +68,12 @@
   @keyframes growbar{from{width:0}}
   .bar>i{animation:growbar .6s ease}
   @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+  .msg{padding:7px 0;border-bottom:1px dashed var(--line);font-size:15px}
+  .msg b{color:var(--accent-2)}
+  #crisisOv{position:fixed;inset:0;background:rgba(20,30,35,.55);display:flex;align-items:center;justify-content:center;z-index:50;padding:18px}
+  #crisisOv .box{background:#fff;border-radius:14px;max-width:520px;padding:22px 24px;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+  #crisisOv .box h2{color:var(--dan-ink)}
+  textarea{font:inherit;padding:10px;border:1px solid var(--line);border-radius:9px;width:100%;min-height:84px;resize:vertical;background:#fff;color:var(--ink)}
 </style>
 </head>
 <body>
@@ -76,6 +82,7 @@
   <nav>
     <button class="tab" data-v="over" id="t-over"></button>
     <button class="tab" data-v="inst" id="t-inst"></button>
+    <button class="tab" data-v="see" id="t-see"></button>
     <button class="tab" data-v="grow" id="t-grow"></button>
     <button class="tab" data-v="set" id="t-set"></button>
     <button class="open" id="openInst"></button>
@@ -127,7 +134,25 @@ const L = {
     sound:"完成音效", on:"开", off:"关", dataSec:"数据", dataP:"所有数据保存在本机浏览器；清除数据请在训练平台右上角「重置」。",
     langBtn:()=>lang==="zh"?"EN":"中文",
     dayShort:"第", rpeShort:"RPE",
-    errPrefix:"错误：", netErr:"网络/跨域限制，无法从浏览器直接调用该服务（不影响本地功能）。"
+    errPrefix:"错误：", netErr:"网络/跨域限制，无法从浏览器直接调用该服务（不影响本地功能）。",
+    tSee:"被看见",
+    seeSub:"这里只有你、你的话，和不会被评判的安静。写什么都行，停在任何时候都行。",
+    seeHintAi:"已连接你的 AI 服务——TA 会安静地听、偶尔轻轻问一句。",
+    seeHintPaper:"纸笔模式：写给自己的话，也会被看见。想要对话陪伴，可在「设置」连接 AI 服务。",
+    seePlaceholder:"此刻，写什么都行……", sendLabel:"说出去", writeLabel:"写下来",
+    nextGuide:"换一个引导", collapse:"收束成一张卡片", clearSee:"清空这场对话",
+    clearConfirm:"清空这场对话？收好的卡片会保留。",
+    cardTitle:"本心卡片", cardFeel:"此刻最真实的感受", cardFind:"一个发现（哪怕很小）",
+    cardStep:"一小步（可选——低到不可能失败）", stepPh:"低到不可能失败的那种",
+    saveCard:"收好这张卡片", cardSaved:"收好了 ✓ 它在下面的足迹里。",
+    cardsFoot:"足迹 · 收好的卡片", noCards:"还没有卡片。它们会在你愿意收束的时候出现。",
+    you:"你", companion:"陪伴", guideLabel:(n)=>`引导 ${n} / 5：`, startAny:"想从哪句说起都可以。",
+    aiFail:"（连接 AI 时出了点状况——先继续写，或到「设置」检查连接。）", busy:"正在倾听……",
+    goTrain:"去训练平台做两分钟启动版 →",
+    seeSafetyLine:"如果此刻你有伤害自己的念头：心理援助热线 12356（中国，24 小时），或前往当地急诊。你不是一个人。",
+    crisisTitle:"此刻，请先让自己安全",
+    crisisBody:"你刚才写下的话让我很担心你。请现在联系专业帮助：<br>· 心理援助热线 <b>12356</b>（中国，24 小时）<br>· 或拨打 120 / 前往最近的急诊<br>· 如果可以，告诉身边任何一个人。<br>我会在。但此刻，你需要一个真人来保护你。",
+    crisisClose:"我知道了，我先留在这里"
   },
   en:{
     brandSub:"Main platform · present & produce", openInst:"Open training app →",
@@ -165,7 +190,25 @@ const L = {
     sound:"Completion sound", on:"On", off:"Off", dataSec:"Data", dataP:"Everything lives in this browser; clear data via “Reset” in the training app's top bar.",
     langBtn:()=>lang==="zh"?"EN":"中文",
     dayShort:"Day", rpeShort:"RPE",
-    errPrefix:"Error: ", netErr:"Network or cross-origin restriction: this service can't be called directly from a browser (local features are unaffected)."
+    errPrefix:"Error: ", netErr:"Network or cross-origin restriction: this service can't be called directly from a browser (local features are unaffected).",
+    tSee:"Being seen",
+    seeSub:"Just you, your words, and a quiet that never judges. Write anything, stop anytime.",
+    seeHintAi:"Your AI service is connected — it listens quietly and occasionally asks a soft question.",
+    seeHintPaper:"Paper mode: what you write to yourself is seen too. For a talking companion, connect an AI service in Settings.",
+    seePlaceholder:"Right now, anything at all…", sendLabel:"Say it", writeLabel:"Write it",
+    nextGuide:"Another prompt", collapse:"Fold into a card", clearSee:"Clear this session",
+    clearConfirm:"Clear this session? Saved cards will remain.",
+    cardTitle:"Heart card", cardFeel:"What's most true right now", cardFind:"One discovery (however small)",
+    cardStep:"One small step (optional — too small to fail)", stepPh:"The kind that can't fail",
+    saveCard:"Keep this card", cardSaved:"Kept ✓ It's in the trail below.", cardsFoot:"Trail · kept cards",
+    noCards:"No cards yet. They'll appear whenever you're ready.",
+    you:"You", companion:"Companion", guideLabel:(n)=>`Prompt ${n} / 5:`, startAny:"Start anywhere you like.",
+    aiFail:"(Something went wrong connecting to your AI — keep writing, or check Settings.)", busy:"Listening…",
+    goTrain:"Open the training app for a 2-minute restart →",
+    seeSafetyLine:"If you're having thoughts of harming yourself: please reach out now — your local crisis line or emergency services. You are not alone.",
+    crisisTitle:"Right now, please get safe",
+    crisisBody:"What you just wrote worries me. Please reach out now:<br>· Your local crisis line<br>· Or emergency services / the nearest ER<br>· If you can, tell one person.<br>I'll stay here. But right now you need a human to keep you safe.",
+    crisisClose:"I know — I'll stay here for now"
   }
 };
 const t = (k,...a) => { const v = L[lang][k] ?? L.zh[k] ?? k; return typeof v === "function" ? v(...a) : v; };
@@ -200,9 +243,22 @@ function streak(){
   let n=0; for(let d=firstUndone-1; d>=1; d--){ const r=S.prog.days[d]; if(r&&r.done) n++; else break; }
   return n;
 }
+/* ---------------- sound (WebAudio, offline, tiny) ---------------- */
+function chime(kind){
+  if(localStorage.getItem("mhSound") === "off") return;
+  try{
+    const C = window.AudioContext || window.webkitAudioContext; if(!C) return;
+    const ctx = new C(); const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = "sine"; o.frequency.value = kind === "warn" ? 330 : 660;
+    g.gain.value = .07; o.connect(g); g.connect(ctx.destination);
+    o.start();
+    o.frequency.exponentialRampToValueAtTime(kind === "warn" ? 262 : 990, ctx.currentTime + .22);
+    g.gain.exponentialRampToValueAtTime(.0008, ctx.currentTime + .4);
+    o.stop(ctx.currentTime + .45);
+  }catch(e){}
+}
 function sparkline(es){
-  if(es.length < 2) return "";
-  const w=560, h=96, pad=8;
+  if(es.length < 2) return "";  const w=560, h=96, pad=8;
   const pts = es.map((x,i) => [
     pad + i*((w-2*pad)/(es.length-1)),
     h - pad - ((x.r.rpe-1)/9)*(h-2*pad)
@@ -221,12 +277,13 @@ let view = "over";
 function renderChrome(){
   document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
   document.getElementById("hSub").textContent = "· " + t("brandSub");
-  ["over","inst","grow","set"].forEach(v => {
+  ["over","inst","see","grow","set"].forEach(v => {
     const b = document.getElementById("t-"+v);
     b.classList.toggle("active", view === v);
   });
   document.getElementById("t-over").innerHTML = IC.chart + " " + t("tOver");
   document.getElementById("t-inst").innerHTML = IC.grid + " " + t("tInst");
+  document.getElementById("t-see").innerHTML = IC.heart + " " + t("tSee");
   document.getElementById("t-grow").innerHTML = IC.spark + " " + t("tGrow");
   document.getElementById("t-set").innerHTML = IC.gear + " " + t("tSet");
   document.getElementById("openInst").textContent = t("openInst");
@@ -238,6 +295,7 @@ function render(){
   const app = document.getElementById("app");
   if(view === "over") app.innerHTML = viewOver();
   else if(view === "inst") app.innerHTML = viewInst();
+  else if(view === "see") app.innerHTML = viewSee();
   else if(view === "grow") app.innerHTML = viewGrow();
   else app.innerHTML = viewSet();
 }
@@ -403,6 +461,167 @@ document.getElementById("openInst").addEventListener("click", () => { location.h
 document.getElementById("langBtn").addEventListener("click", () => {
   lang = lang === "zh" ? "en" : "zh";
   localStorage.setItem("mhLang", lang); render();
+});
+/* ---------------- 被看见（Being seen）---------------- */
+const SEE_KEY = "mhSeeSess", CARDS_KEY = "mhSeeCards";
+let seeSess = null, seeBusy = false, collapseOpen = false, cardMsg = "", crisisShown = false;
+try { seeSess = JSON.parse(localStorage.getItem(SEE_KEY) || "null"); } catch(e) {}
+seeSess = seeSess || {mode:"guide", idx:0, msgs:[]};
+function saveSee(){ localStorage.setItem(SEE_KEY, JSON.stringify(seeSess)); }
+function aiCfg(){ try { return JSON.parse(localStorage.getItem("mhAiCfg") || "null"); } catch(e){ return null; } }
+function aiReady(){ const c = aiCfg(); return !!(c && c.base && c.key && c.model); }
+const esc = s => (s||"").replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+const SEE_GUIDES = {
+  zh:[
+    "此刻，身体和心里各是什么感觉？不用组织语言，想到什么写什么。",
+    "如果给此刻的感受起一个天气的名字——是阴、是雨、是雾、还是什么都没有？多说一点它。",
+    "这些话背后，最希望被谁、怎样看见？",
+    "其中有没有一句话，像是保护自己的「墙」？又有没有一句，更像你自己的声音？各写一句，不用判断对错。",
+    "如果只留下一句最重要的话，是哪一句？（可以收束成卡片了）"
+  ],
+  en:[
+    "Right now, what do your body and your heart each feel? No need to make sense — write whatever comes.",
+    "If this feeling had a weather name — rain, fog, overcast, or clear — what would it be? Say more about it.",
+    "Behind these words: who do you most want to be seen by, and how?",
+    "Is there one line that sounds like a wall protecting you — and one that sounds more like your own voice? Write both; don't judge either.",
+    "If only one sentence could remain, which one? (You can fold it into a card now.)"
+  ]
+};
+const STEP_BANK = {
+  zh:["打开窗户，深呼吸一分钟。","站起来，喝一杯水。","去训练平台做两分钟启动版。","给一个信任的人发一句话——或者不发，也没关系。","把此刻写进卡片，就已经是行动。"],
+  en:["Open a window and breathe for one minute.","Stand up and drink a glass of water.","Do the 2-minute restart in the training app.","Text one trusted person — or don't; that's fine too.","Writing this moment into a card already counts as action."]
+};
+const SEE_PROMPT = `你是「被看见」空间的陪伴者。来到这里的人可能心力很低、高度敏感，或正处于情绪困境。
+
+你的唯一任务：陪伴 TA 梳理此刻的内心。不解决问题、不给建议、不评判、不引导对方"积极起来"。
+
+方法（一次回复只用其中一步）：
+1. 倾听：先完整接住 TA 说的话。
+2. 澄清：最多用一个简短的问题，邀请 TA 多说一点。
+3. 镜映：用自己的话复述你听到的感受（"听起来……"）。
+4. 辨析：当 TA 在"保护自己的墙"与"本心"之间挣扎时，不宣判谁对谁错——建议一个成本极小的现实检验（例：如果担心出门会崩溃，就试试十分钟版本，让现实来回答）。
+5. 结晶：当表达自然告一段落，邀请 TA 把此刻收束成一张卡片（最真实的感受 + 一个发现 + 可选的一小步）。
+
+铁律：
+- 用与用户相同的语言回复。
+- 每次回复 60-120 字，口语、温和、不用列表、不用标题。
+- 不诊断疾病、不谈药物、不说"你应该"、不催促、不表演共情（避免"我完全理解你"——你无法完全理解任何人，包括 TA 自己）。
+- 如实承认你是 AI 陪伴空间（如果被问起）。
+- 若出现自伤、自杀或伤害他人的念头：立即停止一切引导，温和而直接地建议联系专业帮助（如中国心理援助热线 12356 或当地急诊），说明你会在这里，但此刻需要真人。之后保持极简短、温和的陪伴。`;
+const CRISIS_RE = /(自杀|自伤|不想活|想去死|去死|结束生命|结束自己|轻生|伤害自己|kill myself|suicide|end my life|self.?harm|hurt myself)/i;
+function crisisCheck(text){
+  if(text && CRISIS_RE.test(text) && !crisisShown){
+    crisisShown = true;
+    const ov = document.createElement("div");
+    ov.id = "crisisOv";
+    ov.innerHTML = `<div class="box" role="dialog" aria-modal="true"><h2>${t("crisisTitle")}</h2><p>${t("crisisBody")}</p><p><button class="primary" id="crisisClose">${t("crisisClose")}</button></p></div>`;
+    document.body.appendChild(ov);
+    ov.addEventListener("click", e => { if(e.target.id === "crisisClose" || e.target === ov) ov.remove(); });
+  }
+}
+function viewSee(){
+  const ai = aiReady();
+  let inner;
+  if(ai){
+    const msgs = seeSess.msgs.map(m =>
+      `<div class="msg"><b>${m.role === "user" ? t("you") : t("companion")}：</b>${esc(m.content)}</div>`).join("");
+    inner = (msgs || `<p class="muted">${t("startAny")}</p>`) +
+      (seeBusy ? `<p class="muted">${t("busy")}</p>` : `<textarea id="seeText" placeholder="${t("seePlaceholder")}"></textarea>
+      <p style="margin:10px 0 0"><button class="primary" id="seeSend">${t("sendLabel")}</button>
+      <button id="seeCollapse">${t("collapse")}</button>
+      <button class="ghost" id="clearSee">${t("clearSee")}</button></p>`);
+  } else {
+    const idx = Math.min(seeSess.idx, SEE_GUIDES[lang].length - 1);
+    const msgs = seeSess.msgs.map(m =>
+      `<div class="msg"><b>${m.role === "user" ? t("you") : t("companion")}：</b>${esc(m.content)}</div>`).join("");
+    inner = `<div class="banner note">${t("guideLabel", idx+1)}<b>${SEE_GUIDES[lang][idx]}</b></div>` +
+      (msgs || "") +
+      (seeBusy ? `<p class="muted">${t("busy")}</p>` : `<textarea id="seeText" placeholder="${t("seePlaceholder")}"></textarea>
+      <p style="margin:10px 0 0"><button class="primary" id="seeSend">${t("writeLabel")}</button>
+      ${seeSess.idx < SEE_GUIDES[lang].length-1 ? `<button id="seeNext">${t("nextGuide")}</button>` : ""}
+      <button id="seeCollapse">${t("collapse")}</button>
+      <button class="ghost" id="clearSee">${t("clearSee")}</button></p>`);
+  }
+  let cardForm = "";
+  if(collapseOpen){
+    const steps = STEP_BANK[lang].map(s => `<button class="ghost" data-step="${esc(s)}">${esc(s)}</button>`).join(" ");
+    const lastUser = [...seeSess.msgs].reverse().find(m => m.role === "user");
+    cardForm = `<div class="card">
+      <h2>${IC.heart}${t("cardTitle")}</h2>
+      <label>${t("cardFeel")}</label>
+      <textarea id="cFeel">${esc(lastUser ? lastUser.content.slice(0,140) : "")}</textarea>
+      <label>${t("cardFind")}</label>
+      <input type="text" id="cFind">
+      <label>${t("cardStep")}</label>
+      <input type="text" id="cStep" placeholder="${t("stepPh")}">
+      <p>${steps}</p>
+      <p><button class="primary" id="saveCard">${t("saveCard")}</button>
+         <a href="index.html" style="font-size:14px">${t("goTrain")}</a></p></div>`;
+  }
+  const cards = JSON.parse(localStorage.getItem(CARDS_KEY) || "[]");
+  const cardsHtml = cards.length ? [...cards].reverse().map(c =>
+    `<div class="msg"><b>${new Date(c.ts).toLocaleString(lang==="zh"?"zh-CN":"en-US")}</b><br>「${esc(c.feel)}」` +
+    (c.find ? `<br><span class="muted">${lang==="zh"?"发现":"Found"}：${esc(c.find)}</span>` : "") +
+    (c.step ? `<br><span class="muted">${lang==="zh"?"一小步":"Small step"}：${esc(c.step)}</span>` : "") + `</div>`).join("")
+    : `<p class="muted">${t("noCards")}</p>`;
+  return `<h1>${IC.heart} ${t("tSee")}</h1><p class="sub">${t("seeSub")}</p>
+    <div class="banner note">${ai ? t("seeHintAi") : t("seeHintPaper")}</div>
+    <div class="card">${inner}</div>
+    ${cardForm}
+    ${cardMsg ? `<div class="banner ok">${cardMsg}</div>` : ""}
+    <div class="card"><h2>${IC.chart}${t("cardsFoot")}</h2>${cardsHtml}</div>
+    <p class="muted small">${t("seeSafetyLine")}</p>`;
+}
+async function seeSend(){
+  const el = document.getElementById("seeText");
+  const text = (el ? el.value : "").trim();
+  if(!text) return;
+  crisisCheck(text);
+  const c = aiCfg();
+  if(seeSess.mode === "ai" && aiReady()){
+    seeSess.msgs.push({role:"user", content:text});
+    seeBusy = true; saveSee(); render();
+    try{
+      const res = await fetch(c.base.replace(/\/+$/,"") + "/chat/completions", {
+        method:"POST",
+        headers:{"Content-Type":"application/json", "Authorization":"Bearer " + c.key},
+        body: JSON.stringify({model:c.model, messages:[{role:"system", content:SEE_PROMPT}, ...seeSess.msgs], max_tokens:400, temperature:0.8})
+      });
+      const j = await res.json();
+      const reply = j.choices && j.choices[0] && j.choices[0].message ? j.choices[0].message.content.trim() : null;
+      seeSess.msgs.push({role:"assistant", content: reply || t("aiFail")});
+    }catch(err){
+      seeSess.msgs.push({role:"assistant", content: t("aiFail")});
+    }
+    seeBusy = false; saveSee(); render();
+  } else {
+    seeSess.msgs.push({role:"user", content:text});
+    saveSee(); render();
+  }
+}
+document.getElementById("app").addEventListener("click", e => {
+  if(e.target.id === "seeSend") seeSend();
+  if(e.target.id === "seeNext"){ seeSess.idx = Math.min(seeSess.idx+1, SEE_GUIDES[lang].length-1); saveSee(); render(); }
+  if(e.target.id === "seeCollapse"){ collapseOpen = !collapseOpen; cardMsg = ""; render(); }
+  if(e.target.id === "clearSee"){
+    const msg = lang === "zh" ? "清空这场对话？收好的卡片会保留。" : "Clear this session? Saved cards will remain.";
+    if(confirm(msg)){ seeSess = {mode: seeSess.mode, idx:0, msgs:[]}; saveSee(); render(); }
+  }
+  if(e.target.id === "saveCard"){
+    const feel = document.getElementById("cFeel").value.trim();
+    if(!feel) return;
+    const cards = JSON.parse(localStorage.getItem(CARDS_KEY) || "[]");
+    cards.push({ts: Date.now(), feel,
+                find: document.getElementById("cFind").value.trim(),
+                step: document.getElementById("cStep").value.trim()});
+    localStorage.setItem(CARDS_KEY, JSON.stringify(cards));
+    collapseOpen = false; cardMsg = t("cardSaved"); chime("done"); render();
+  }
+  const st = e.target.getAttribute && e.target.getAttribute("data-step");
+  if(st){ const inp = document.getElementById("cStep"); if(inp){ inp.value = st; } }
+});
+document.getElementById("app").addEventListener("keydown", e => {
+  if(e.target.id === "seeText" && e.key === "Enter" && (e.ctrlKey || e.metaKey)) seeSend();
 });
 render();
 </script>
