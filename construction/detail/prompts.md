@@ -1,7 +1,7 @@
 # 细节层：构筑指导 Prompt
 
 > 用途：**构筑期**——把冻结的意图基线落成可判决的交互规格。与 `humanity/synthesis/prompts/`（运营期）相互独立。
-> **状态：全部草稿·已审核（2026-09-30 批准）。** 方法论依据见 [methodology-map.md](methodology-map.md)。
+> **状态：全部已审核（2026-09-30 批准）。** 方法论依据见 [methodology-map.md](methodology-map.md)。
 
 ## P-DTL-1 事件穷举
 

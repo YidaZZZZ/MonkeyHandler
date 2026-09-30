@@ -1,6 +1,6 @@
 # 动机设计 Prompt
 
-> **状态：草稿·已审核（2026-09-30 批准）**。落点 `core/motivation.py`、执行闭环（M3）、check-in 文案。
+> **状态：已审核（2026-09-30 批准）**。落点 `core/motivation.py`、执行闭环（M3）、check-in 文案。
 
 ## P-MOT-1 难度校准（心流通道）
 
