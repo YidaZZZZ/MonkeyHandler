@@ -6,17 +6,19 @@ AI 驱动的**个体化学习/训练工作台**开源框架（Python）。
 
 市面上的训练计划普遍有两个盲区：**不懂人**——模板化计划无视个体的作息、精力曲线、动机类型与伤病史；**不懂领域**——计划背后的「为什么」不可见，常常偏离该领域真正有效的方法。结果大多数人中途放弃。MonkeyHandler 把解决方案拆成三个引擎 + 一个闭环，并把「对人本身的深刻理解」做成一等公民。
 
-## 定位：元平台，而不是某个训练计划
+## 定位：创始人自用的双引擎平台，同时是可复用的元平台（D1 裁决 · 2026-09-30）
 
-MonkeyHandler 本体是一个**呈现与生产平台**：
+**主序 ① · 自用产品**：双引擎——觉察引擎「[被看见](construction/being-seen.md)」（心理侧：无评判的倾诉与梳理，本心卡片）+ 技能引擎「[训练平台](construction/demo/index.html)」（技能侧：把第一步拆到低于心力阈值，20 天脊柱侧弯运动拉伸为首个实例）。当前一切效果主张为 **n=1 自实验**（创始人为唯一用户）。
 
-- **呈现**：沉淀并呈现关于人类的著作资产（humanity/）、构筑方法（construction/）与运营期提示词（synthesis/）；
-- **生产**：基于用户的训练需求，在其手中**生成**一个训练计划平台（实例）——例如针对「20 天从运动和拉伸层面缓解脊柱侧弯」生成的 demo；
-- **数据飞轮**：每个实例在运行中累积该用户的执行数据，回流修正元平台（画像模型、知识置信度、方法论验证），让下一次生产更有效。
+**主序 ② · 可复用元平台**：生产能力（画像 → 生成实例，建设中）+ 可插拔领域包 + 著作库流水线，让每一个新实例、新用户、新领域低成本启动。
+
+**副产品**：开发者框架（src/ 引擎与协议、构筑体系、测试）。
+
+**待审核队列**：[docs/review-queue.md](docs/review-queue.md)（53 项：36 本著作 + 8 件 synthesis + 9 件构筑文档，分三批）。
 
 **训练计划平台是阶段性产物**：因需求而生、随目标完成而归档，其数据沉淀回元平台——MonkeyHandler 因此越用越有效。
 
-> **诚实声明（2026-09-30）**：① 上面的「生成」能力当前处于建设初期——现有实例 demo 为**手工产出**，生成链路（画像→自动生成实例）尚未实装（见路线图 M1+）；② 当前一切效果主张均为 **n=1 自实验**（创始人为唯一用户），随访数据通道自 M3 起建立。
+> **诚实声明（2026-09-30）**：① 「生成」能力当前处于建设初期——现有实例 demo 为**手工产出**，生成链路（画像→自动生成实例）已授权两周内打通（D4，见路线图）；② 当前一切效果主张均为 **n=1 自实验**（创始人为唯一用户），随访数据通道自 M3 起建立；③ 前身项目 **guanzi（罐子）**——本地多模型觉察工作台，其「见/格」方法论已并入本项目的觉察引擎（D2 裁决），仓库归档为前身并保留致敬。
 
 （English TL;DR: MonkeyHandler is a Python framework for building human-friendly, individualized training workbenches. It pairs a book-derived model of human nature — universal mechanisms plus individual-difference dimensions — with an evidence-based user profile, pluggable cited domain research, and motivation-aware plan generation with an execution feedback loop.）
 
