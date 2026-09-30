@@ -87,7 +87,15 @@ def generate(
         m = _os.environ.get("MONKEYHANDLER_LLM_MODEL")
         if b and k and m:
             cfg = {"base": b, "key": k, "model": m}
-    llm = OpenAICompatClient(cfg["base"], cfg["key"], cfg["model"]) if cfg else None
+    if cfg is None:
+        typer.secho(
+            "未配置 AI 服务：请用 --ai-config 传入配置 JSON，或设置环境变量 "
+            "MONKEYHANDLER_LLM_BASE_URL / MONKEYHANDLER_LLM_API_KEY / MONKEYHANDLER_LLM_MODEL。\n"
+            "本命令只走 LLM 生成（无离线回退）。",
+            fg=typer.colors.RED,
+        )
+        raise typer.Exit(1)
+    llm = OpenAICompatClient(cfg["base"], cfg["key"], cfg["model"])
 
     answers = {
         "training_experience": level,
@@ -101,7 +109,11 @@ def generate(
         "time_budget": str(time * 7),
     }
     gen = InstanceGenerator(FitnessPack(), llm=llm)
-    user, spec, via = gen.generate(goal, answers, horizon_days=days)
+    try:
+        user, spec, via = gen.generate(goal, answers, horizon_days=days)
+    except Exception as e:
+        typer.secho(f"生成失败：{e}", fg=typer.colors.RED)
+        raise typer.Exit(1)
     html = render_instance(goal=goal, spec=spec, user=user, via=via)
     if out:
         path = _pl.Path(out)
