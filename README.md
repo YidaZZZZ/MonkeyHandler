@@ -16,6 +16,8 @@ MonkeyHandler 本体是一个**呈现与生产平台**：
 
 **训练计划平台是阶段性产物**：因需求而生、随目标完成而归档，其数据沉淀回元平台——MonkeyHandler 因此越用越有效。
 
+> **诚实声明（2026-09-30）**：① 上面的「生成」能力当前处于建设初期——现有实例 demo 为**手工产出**，生成链路（画像→自动生成实例）尚未实装（见路线图 M1+）；② 当前一切效果主张均为 **n=1 自实验**（创始人为唯一用户），随访数据通道自 M3 起建立。
+
 （English TL;DR: MonkeyHandler is a Python framework for building human-friendly, individualized training workbenches. It pairs a book-derived model of human nature — universal mechanisms plus individual-difference dimensions — with an evidence-based user profile, pluggable cited domain research, and motivation-aware plan generation with an execution feedback loop.）
 
 ## 三大能力 + 一个闭环
