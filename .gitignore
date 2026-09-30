@@ -13,6 +13,9 @@ venv/
 .coverage
 htmlcov/
 
+# 构建产物（demo 下载包）
+construction/demo/dist/
+
 # IDE
 .idea/
 .vscode/

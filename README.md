@@ -72,6 +72,17 @@ flowchart LR
 
 ## 快速开始
 
+### 下载即用（不需要编程知识）
+
+打开 [`construction/demo/`](construction/demo/) 文件夹：
+
+- 双击 **main.html**（主平台：提升总览 / 我的训练平台 / 设置）或 **index.html**（训练平台：20 天脊柱侧弯运动拉伸）——浏览器直接打开，无需安装任何东西；
+- 数据全部保存在你自己的浏览器里，不上传、无需注册；
+- 支持中文 / English（页头一键切换）；可在主平台「设置」里连接你自己的 AI 服务（智谱 GLM / OpenAI / DeepSeek / Ollama / 自定义，密钥只存本机）；
+- 要分发给朋友：`python construction/demo/build_dist.py` 会打出一个可直接发送的 zip 包。
+
+### 开发者
+
 ```bash
 git clone <repo-url>
 cd MonkeyHandler

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MonkeyHandler demo · 20 天脊柱侧弯运动与拉伸</title>
+<title>MonkeyHandler · Training / 训练</title>
 <style>
   :root{--bg:#f4f7f8;--card:#fff;--ink:#22313a;--muted:#5b6b76;--accent:#0f766e;--accent-soft:#e0f2f0;
         --warn-ink:#92400e;--warn-bg:#fef3c7;--dan-ink:#991b1b;--dan-bg:#fee2e2;--ok-ink:#166534;--ok-bg:#dcfce7;
@@ -15,10 +15,11 @@
          border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
   .brand{font-weight:700;color:var(--accent)}
   .brand small{color:var(--muted);font-weight:400;margin-left:6px}
-  nav{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+  nav{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto;align-items:center}
   button{font:inherit;cursor:pointer;border-radius:9px;border:1px solid var(--line);background:#fff;
-         color:var(--ink);padding:8px 14px;transition:background .15s}
+         color:var(--ink);padding:8px 14px;transition:background .15s,transform .1s}
   button:hover{background:var(--accent-soft)}
+  button:active{transform:scale(.98)}
   button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
   button.primary:hover{filter:brightness(1.08)}
   button.ghost{border-color:transparent;color:var(--muted)}
@@ -26,120 +27,282 @@
   :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   main{max-width:860px;margin:0 auto;padding:20px 16px 60px}
   a{color:var(--accent)}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin:14px 0}
-  h1{font-size:22px;margin:8px 0 4px} h2{font-size:18px;margin:0 0 10px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;
+        margin:14px 0;animation:rise .28s ease both}
+  h1{font-size:22px;margin:8px 0 4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  h2{font-size:17px;margin:0 0 10px;display:flex;align-items:center;gap:7px}
   .muted{color:var(--muted)} .tag{display:inline-block;background:var(--accent-soft);color:var(--accent);
-      border-radius:999px;padding:1px 10px;font-size:13px;margin-right:6px}
-  .banner{border-radius:var(--radius);padding:12px 16px;margin:12px 0;font-size:15px}
+      border-radius:999px;padding:1px 10px;font-size:13px}
+  .banner{border-radius:var(--radius);padding:12px 16px;margin:12px 0;font-size:15px;animation:rise .28s ease both}
   .banner.warn{background:var(--warn-bg);color:var(--warn-ink)}
   .banner.dan{background:var(--dan-bg);color:var(--dan-ink)}
   .banner.ok{background:var(--ok-bg);color:var(--ok-ink)}
   .q{margin:16px 0} .q p{margin:0 0 6px;font-weight:600} .q .why{font-weight:400;color:var(--muted);font-size:14px}
-  label.opt{display:block;padding:8px 12px;border:1px solid var(--line);border-radius:9px;margin:6px 0;cursor:pointer}
+  label.opt{display:flex;gap:8px;padding:8px 12px;border:1px solid var(--line);border-radius:9px;margin:6px 0;cursor:pointer}
   label.opt:hover{background:var(--accent-soft)}
   .ex{border-top:1px dashed var(--line);padding:12px 0}
   .ex:first-child{border-top:none}
   .ex .head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
-  .ex .name{font-weight:600}
+  .ex .name{font-weight:600;display:flex;align-items:center;gap:7px}
   .ex .dur{color:var(--accent);font-size:14px;white-space:nowrap}
-  .ex .cue{margin:4px 0 0;color:var(--ink)}
+  .ex .cue{margin:4px 0 0}
   details{margin-top:6px} summary{cursor:pointer;color:var(--accent);font-size:14px}
   .bar{height:10px;background:var(--line);border-radius:999px;overflow:hidden;margin:8px 0}
-  .bar>i{display:block;height:100%;background:var(--accent)}
+  .bar>i{display:block;height:100%;background:var(--accent);border-radius:999px;transition:width .6s ease}
   table{width:100%;border-collapse:collapse;font-size:14px}
   th,td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left}
   th{color:var(--muted);font-weight:600}
   .pnum{display:inline-block;min-width:2.2em;text-align:center;border-radius:6px;background:var(--line);padding:0 4px}
-  .pnum.low{background:#dcfce7;color:var(--ok-ink)} .pnum.high{background:var(--dan-bg);color:var(--dan-ink)}
+  .pnum.low{background:var(--ok-bg);color:var(--ok-ink)} .pnum.high{background:var(--dan-bg);color:var(--dan-ink)}
   select,textarea,input[type=text]{font:inherit;padding:8px;border:1px solid var(--line);border-radius:9px;width:100%;
       max-width:420px;background:#fff;color:var(--ink)}
+  svg.ic{width:16px;height:16px;flex:none;vertical-align:-2px}
+  h2 svg.ic{width:17px;height:17px}
   footer{max-width:860px;margin:0 auto;padding:16px;color:var(--muted);font-size:13px}
   [hidden]{display:none !important}
-  @media (prefers-reduced-motion: reduce){*{transition:none !important}}
+  @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @keyframes growbar{from{width:0}}
+  .bar>i{animation:growbar .6s ease}
+  @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
 </style>
 </head>
 <body>
 <header>
-  <span class="brand">MonkeyHandler<small>demo · 非医疗建议</small></span>
-  <a href="main.html" style="margin-left:auto;font-size:14px;color:var(--accent)">← 主平台</a>
+  <span class="brand">MonkeyHandler<small id="hSub"></small></span>
+  <a href="main.html" id="hMain"></a>
   <nav id="nav" hidden>
-    <button data-go="today" id="tab-today">今日训练</button>
-    <button data-go="plan">20 天总览</button>
-    <button data-go="why">关于计划</button>
-    <button class="ghost" id="reset">重置</button>
+    <button data-go="today" id="tab-today"></button>
+    <button data-go="plan" id="tab-plan"></button>
+    <button data-go="about" id="tab-about"></button>
+    <button class="ghost" id="reset"></button>
+    <button class="ghost" id="langBtn"></button>
   </nav>
 </header>
 <div id="banners" style="max-width:860px;margin:0 auto;padding:0 16px"></div>
 <main id="app"></main>
-<footer>
-  数据仅保存在本机浏览器（localStorage），不上传。本页面为交互框架 demo：练习内容为通用运动常识，不构成医疗处方；
-  脊柱侧弯的专向训练（如施罗斯疗法）需要专业评估与认证指导。
-</footer>
+<footer id="foot" class="small"></footer>
 
 <script>
 "use strict";
-/* ---------------- 数据 ---------------- */
+/* ---------------- language ---------------- */
+let lang = localStorage.getItem("mhLang") ||
+  ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
+const L = {
+  zh:{
+    brandSub:"非医疗建议", mainLink:"← 主平台", tabToday:"今日训练", tabPlan:"20 天总览",
+    tabAbout:"关于计划", reset:"重置", footer:"数据仅保存在本机浏览器（localStorage），不上传。练习内容为通用运动常识，不构成医疗处方；脊柱侧弯的专向训练（如施罗斯疗法）需要专业评估与认证指导。",
+    obTitle:"开始之前：了解你这一个人", obSub:"7 个问题，每个都会真实改变你的计划。答案只存在你的浏览器里。",
+    go:"生成我的 20 天计划", needPick:"请先选择：",
+    dayOf:(d)=>`第 ${d} / 20 天`,
+    fallbackNote:`昨天缺席——今天自动回落到<b>两分钟启动版</b>（不补课、不惩罚）。做完就算完成，先回来，再继续。`,
+    lockNote:`<b>安全锁定中</b>：出现过疼痛 ≥4 → 只保留基础动作，停止加量；建议就医评估后再恢复完整训练。`,
+    recoverNote:`<b>今日为轻量版</b>：睡眠不足或压力大的时候，计划会自动变轻——只保留基础动作。这不是偷懒，是计划的一部分。`,
+    budgetNote:(k,n,t)=>`按你的 ${k} 分钟预算，今天安排了其中的 ${n} 项。`,
+    checkin:"完成后打卡", done:"今日已完成", rpe:"自觉强度 RPE（1-10，越轻松越低）",
+    painL:"训练中背部疼痛（0-10；达到 4 分会触发保护规则）", noteL:"一句感受（可选）",
+    notePh:"例如：转身比昨天顺畅", submit:"提交打卡", skip:"今天跳过（记为缺席）",
+    skipConfirm:"记为缺席？明天会自动回落到两分钟启动版。",
+    doneBanner:"完成 ✓", firstRecord:"这是你的第一条记录——它就是你的基线。下一次打卡起，这里会告诉你：你是在变强，还是在恢复。",
+    panelTitle:"你的提升痕迹", panelEmpty:"还没有记录——完成今天的训练，这里会出现你的<b>第一条提升曲线</b>。",
+    panelNoFake:"以上全部来自你的打卡数据，只保存在这台设备上。",
+    baseline:(d,v)=>`第 ${d} 天 RPE ${v} 已存——这是你的<b>基线</b>，下一次打卡起，这里会显示你变强的轨迹。`,
+    stronger:(a,b)=>`同样的练习，RPE 从 ${a} 到 ${b}——<b>你在变强。</b>`,
+    heavier:(a,b)=>`RPE 从 ${a} 到 ${b}：近期更吃力——系统会自动帮你降一点难度，这不是你的问题。`,
+    steady:(v)=>`RPE 稳定在 ${v}——基础巩固中。`,
+    stats:(a,b,c,d)=>`完成 ${a}/20 · 连续 ${b} 次 · 疼痛最高 ${c}/10${d} · 缺席 ${S.prog.missed.length} 次`,
+    lockTag:"（安全锁定中）", viewPlan:"看 20 天总览",
+    gradTitle:"20 天完成 🎉",
+    gradBody:`<p>这是 demo 的终点，也是真实产品的起点：</p>
+      <p>1. 建议带着这 20 天的记录（总览页可截图）<b>就医做专业评估</b>——专向训练（如施罗斯疗法）需要认证指导；</p>
+      <p>2. 评估后，真实系统会按评估数据重建个性化计划；</p>
+      <p>3. 想继续维持：重复阶段三的内容，或把练习拆进日常。</p>`,
+    backPlan:"回总览",
+    planTitle:"20 天总览", doneN:(a)=>`完成 ${a}/20`, streakN:(n)=>`连续 ${n} 次`,
+    anti:(mi,pn)=>`缺席 ${mi} 次 · 疼痛最高 ${pn}/10。完成率不是唯一指标——疼痛与缺席同样在面板上。`,
+    thDay:"天", thPhase:"阶段", thFocus:"焦点", thSt:"状态", thRpe:"RPE", thPain:"疼痛",
+    stToday:"今天", stMissed:"缺席", stDash:"—",
+    aboutTitle:"关于这个计划", aboutSub:"这个平台只有一个目标：让你清楚地看见自己在一天天变强。",
+    how:"它是怎么设计的",
+    howP:"20 天分三个阶段：<b>先适应、再稳定、后巩固</b>。每个动作都为「让脊柱在日常姿势里更有支撑」服务；强度按周缓慢递增，最后一周主动减量——变强发生在恢复里，不在硬撑里。",
+    howP2:"每个动作旁边都可以点开「为什么练这个」。练习内容为通用运动常识，不构成医疗处方。",
+    rules:"保护规则", r1:"<b>自动轻量</b>：睡眠不足或压力大的时候，计划自动变轻——恢复和训练一样重要。",
+    r2:"<b>疼痛就停</b>：疼痛达到 4 分及以上，计划停止加量并建议就医。疼痛和酸痛是两回事。",
+    r3:"<b>缺席不惩罚</b>：中断后第二天自动回到两分钟版本——先回来，再继续。",
+    yourData:"你的数据",
+    dataP:"所有打卡记录只保存在这台设备上，用来让下一期计划更贴合你；想重新开始，随时点右上角「重置」一键删除。",
+    bound:"边界",
+    boundP:"脊柱侧弯的专向训练（如施罗斯疗法）需要专业评估与认证指导。这个计划只提供通用的对称练习——如果还没做过评估，请先就医。",
+    bannerNoEval:`你尚未做过专业评估。脊柱侧弯的专向训练（如施罗斯疗法）需要专业评估与认证指导；这里只安排通用的对称运动与拉伸常识。建议先就医评估。`,
+    bannerEverPain:`你的训练记录中出现过疼痛 ≥4。按安全规则，计划已停止加量并保持轻量强度；建议就医评估后再继续。`,
+    interPain:"疼痛 ≥4：安全锁定已触发，计划已停止加量——先就医评估，这比任何进度都重要。",
+    interFirst:"这是你的第一条记录——它就是你的基线。下一次打卡起，这里会告诉你：你是在变强，还是在恢复。",
+    interEasy:(a,b)=>`RPE ${a} → ${b}：明显更轻松——恢复跟上来了，明天会悄悄加一点难度。`,
+    interSlight:(a,b)=>`RPE ${a} → ${b}：稍微轻松了一点——方向是对的。`,
+    interSame:(v)=>`RPE 稳定在 ${v}：同负荷同感受，基础在巩固。`,
+    interHard:(a,b)=>`RPE ${a} → ${b}：比上次吃力。先查可控因素（睡眠/压力/动作质量），系统明天会自动帮你降一点难度——不是你的问题。`,
+    whyTitle:"为什么练这个？",
+    warm:"热身 5 分钟快走/动态活动",
+    deloadNote:"减量日：只做动作质量，不追负荷。"
+  },
+  en:{
+    brandSub:"not medical advice", mainLink:"← Main platform", tabToday:"Today", tabPlan:"20-day overview",
+    tabAbout:"About this plan", reset:"Reset", footer:"All data stays in this browser (localStorage) and never leaves your device. Exercises are general fitness common sense, not medical advice; scoliosis-specific training (e.g. Schroth) requires professional assessment and certified guidance.",
+    obTitle:"Before we start: understanding you", obSub:"7 questions — each one really changes your plan. Answers stay in your browser.",
+    go:"Generate my 20-day plan", needPick:"Please pick:",
+    dayOf:(d)=>`Day ${d} / 20`,
+    fallbackNote:`You missed yesterday — today drops back to the <b>2-minute restart</b> (no make-ups, no punishment). Showing up is the win.`,
+    lockNote:`<b>Safety lock</b>: pain ≥4 was recorded → only basic moves, no progression; please see a professional before resuming full training.`,
+    recoverNote:`<b>Light day</b>: poor sleep or high stress → the plan lightens itself automatically — only the basics. This is part of the plan, not slacking.`,
+    budgetNote:(k,n,t)=>`Within your ${k}-minute budget, today includes ${n} items.`,
+    checkin:"Check in after training", done:"Done for today", rpe:"Effort (RPE 1-10, lower = easier)",
+    painL:"Back pain during training (0-10; 4+ triggers protection)", noteL:"One sentence about it (optional)",
+    notePh:"e.g. twisting felt easier", submit:"Submit check-in", skip:"Skip today (counts as missed)",
+    skipConfirm:"Mark as missed? Tomorrow will drop to the 2-minute restart.",
+    doneBanner:"Done ✓", firstRecord:"First record saved — this is your baseline. From the next check-in, this page tells you whether you're getting stronger.",
+    panelTitle:"Your progress", panelEmpty:"No records yet — finish today's session and your <b>first progress curve</b> appears here.",
+    panelNoFake:"Everything here comes from your check-ins and stays on this device.",
+    baseline:(d,v)=>`Day ${d}: RPE ${v} saved — that's your <b>baseline</b>. Your progress curve starts with the next check-in.`,
+    stronger:(a,b)=>`Same exercises, RPE ${a} → ${b} — <b>you're getting stronger.</b>`,
+    heavier:(a,b)=>`RPE ${a} → ${b}: harder lately — the plan will dial itself down for you.`,
+    steady:(v)=>`RPE steady at ${v} — building a base.`,
+    stats:(a,b,c,d)=>`${a}/20 done · ${b} in a row · pain max ${c}/10${d} · ${S.prog.missed.length} missed`,
+    lockTag:" (safety locked)", viewPlan:"View 20-day overview",
+    gradTitle:"20 days complete 🎉",
+    gradBody:`<p>This is where the demo ends and the real product begins:</p>
+      <p>1. Bring your 20-day record to a <b>professional assessment</b> — targeted training (e.g. Schroth) needs certified guidance;</p>
+      <p>2. After assessment, the real system rebuilds a personalized plan from your data;</p>
+      <p>3. To maintain: repeat phase three, or fold the moves into your day.</p>`,
+    backPlan:"Back to overview",
+    planTitle:"20-day overview", doneN:(a)=>`${a}/20 done`, streakN:(n)=>`${n} in a row`,
+    anti:(mi,pn)=>`${mi} missed · pain max ${pn}/10. Completion isn't the only metric — pain and misses live here too.`,
+    thDay:"Day", thPhase:"Phase", thFocus:"Focus", thSt:"Status", thRpe:"RPE", thPain:"Pain",
+    stToday:"Today", stMissed:"Missed", stDash:"—",
+    aboutTitle:"About this plan", aboutSub:"This platform has one goal: let you clearly see yourself getting stronger, day by day.",
+    how:"How it's designed",
+    howP:"20 days in three phases: <b>adapt, stabilize, consolidate</b>. Every move serves one thing — better everyday support for your spine. Intensity ramps slowly, and the last week deliberately tapers: getting stronger happens in recovery, not in grinding.",
+    howP2:"Each move has a “why” you can open. Exercises are general fitness common sense, not medical advice.",
+    rules:"Protection rules", r1:"<b>Auto-light</b>: poor sleep or high stress → the plan lightens itself — recovery matters as much as training.",
+    r2:"<b>Pain stops play</b>: pain at 4+ pauses progression and suggests seeing a professional. Pain is not soreness.",
+    r3:"<b>No punishment for missing</b>: the next day drops back to the 2-minute restart — come back first, then continue.",
+    yourData:"Your data",
+    dataP:"All check-ins stay on this device and are only used to fit your next cycle better. Reset anytime (top right) to delete everything.",
+    bound:"Boundaries",
+    boundP:"Scoliosis-specific training (e.g. Schroth) requires professional assessment and certified guidance. This plan only offers general symmetric exercises — if you haven't been assessed, please see a professional first.",
+    bannerNoEval:`You haven't had a professional assessment. Scoliosis-specific training (e.g. Schroth) requires assessment and certified guidance; only general symmetric exercises are included here. Please see a professional first.`,
+    bannerEverPain:`Pain ≥4 appeared in your records. Per the safety rule, progression is paused on light intensity; please see a professional before resuming.`,
+    interPain:"Pain ≥4: safety lock triggered, progression paused — see a professional first; that matters more than any progress.",
+    interFirst:"First record saved — this is your baseline. From the next check-in you'll see whether you're getting stronger or still recovering.",
+    interEasy:(a,b)=>`RPE ${a} → ${b}: clearly easier — recovery is keeping up; a little more challenge tomorrow.`,
+    interSlight:(a,b)=>`RPE ${a} → ${b}: slightly easier — right direction.`,
+    interSame:(v)=>`RPE steady at ${v} — same load, same feel: the base is consolidating.`,
+    interHard:(a,b)=>`RPE ${a} → ${b}: harder than last time. Check the controllables (sleep/stress/technique) — the plan will dial down for you tomorrow. Not your fault.`,
+    whyTitle:"Why this exercise?",
+    warm:"Warm up: 5 min brisk walk / dynamic movement",
+    deloadNote:"Taper day: quality only, no load chasing."
+  }
+};
+const t = (k,...a) => { const v = L[lang][k] ?? L.zh[k] ?? k; return typeof v === "function" ? v(...a) : v; };
+const tx = (o) => (typeof o === "object" && o !== null) ? (o[lang] ?? o.zh) : o;
+document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+
+/* ---------------- icons (inline SVG, offline) ---------------- */
+const svg = (d,s=16)=>`<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const IC = {
+  cal: svg('<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>'),
+  chart: svg('<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/>'),
+  book: svg('<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V2H6.5A2.5 2.5 0 0 0 4 4.5z"/>'),
+  flame: svg('<path d="M12 22c4 0 7-2.5 7-6.5 0-3-2-5-3.5-6.5C14 7.5 13 5.5 13 3c-3 2-5 5-5 8-1-1-1.5-2-1.5-3.5C4.5 9.5 5 12 5 14c0 5.5 3 8 7 8z"/>'),
+  heart: svg('<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/>'),
+  check: svg('<path d="M20 6L9 17l-5-5"/>'),
+  moon: svg('<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/>'),
+  info: svg('<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>'),
+  play: svg('<path d="M5 3l16 9-16 9z"/>'),
+  arrow: svg('<path d="M5 12h14M12 5l7 7-7 7"/>'),
+  shield: svg('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'),
+  db: svg('<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.7-4 3-9 3s-9-1.3-9-3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/>')
+};
+
+/* ---------------- data ---------------- */
 const EX = {
-  "ab":      {n:"腹式呼吸", t:1, dur:"90 秒 ×2", cue:"手放腹部，鼻吸 4 秒、口呼 6 秒，肩膀不动。", why:"呼吸模式是姿势与核心激活的底层，也是每天最安全的起点（通用常识）。"},
-  "lat":     {n:"侧向呼吸", t:2, dur:"60 秒 ×2/侧", cue:"手放肋侧，吸气把肋骨推向手掌，两侧对比。", why:"唤醒侧胸廓，两侧对比可觉察不对称（通用常识）。"},
-  "catcow":  {n:"猫牛式", t:1, dur:"8 次 ×2", cue:"呼气弓背、吸气塌腰，动作放慢不追求幅度。", why:"温和恢复脊柱分段活动度（通用常识）。"},
-  "twist":   {n:"仰卧脊柱旋转", t:2, dur:"6 次 ×2/侧", cue:"屈膝倒向一侧，双肩贴地，感受胸椎旋转。", why:"仰卧位胸椎旋转活动度，两侧对比（通用常识）。"},
-  "childs":  {n:"婴儿式放松", t:2, dur:"60 秒", cue:"臀坐脚跟，手臂前伸，呼吸放到背部。", why:"背部整体拉伸放松（通用常识）。"},
-  "sidest":  {n:"站姿侧向拉伸", t:1, dur:"30 秒 ×2/侧", cue:"手臂过头向对侧弯，骨盆保持稳定不甩。", why:"改善躯干两侧张力差异的对称练习（通用常识）。"},
-  "wall":    {n:"靠墙站立检查", t:1, dur:"2 分钟", cue:"后脑/上背/臀三点贴墙，收下颌，正常呼吸。", why:"建立姿势基线，每天对照（通用常识）。"},
-  "scap":    {n:"肩胛后缩", t:2, dur:"10 次 ×2", cue:"挺胸夹背 2 秒再放松，不耸肩。", why:"激活上背姿势肌（通用常识）。"},
-  "deadbug": {n:"死虫式", t:2, dur:"6 次 ×2/侧", cue:"腰贴地，对侧手脚缓慢伸展再收回。", why:"抗伸展核心稳定，对腰背友好（通用常识）。"},
-  "birddog": {n:"鸟狗式", t:2, dur:"6 次 ×2/侧", cue:"四足位，腰保持中立，手脚同起同落。", why:"抗旋转稳定与髋背协调（通用常识）。"},
-  "plank":   {n:"跪姿平板", t:3, dur:"20-30 秒 ×2", cue:"肩腕垂直，收腹，塌腰即停。", why:"前链核心耐力，低负荷起步（通用常识）。"},
-  "sidebr":  {n:"跪姿侧桥", t:3, dur:"15 秒 ×2/侧", cue:"肘膝支撑，髋部抬起与身体成一线。", why:"侧腹链耐力；方向性的强化需要专业评估后个性化，这里做对称练习（通用常识）。"},
-  "ham":     {n:"腘绳肌拉伸", t:2, dur:"45 秒/侧", cue:"微屈膝前屈，酸胀可忍、不痛。", why:"释放骨盆后链张力（通用常识）。"},
-  "hip":     {n:"屈髋肌拉伸", t:2, dur:"45 秒/侧", cue:"弓步，收腹收臀再前移。", why:"改善久坐屈髋张力（通用常识）。"},
-  "thor":    {n:"四足胸椎旋转", t:2, dur:"8 次 ×2/侧", cue:"手扶头，肘去找对侧手腕。", why:"胸椎旋转活动度（拉伸面）（通用常识）。"},
-  "angel":   {n:"靠墙天使", t:2, dur:"8 次 ×2", cue:"背贴墙，手臂沿墙滑动，不耸腰。", why:"肩胛上回旋模式练习（通用常识）。"},
-  "ytw":     {n:"俯卧 Y-T-W", t:3, dur:"6 次 ×2", cue:"沉肩，用肩胛带动手臂抬离地面。", why:"下斜方与肩袖姿势肌群（通用常识）。"},
-  "balance": {n:"单腿站立", t:3, dur:"30 秒 ×2/侧", cue:"髋水平，视线固定一点。", why:"姿势反射与本体感觉（通用常识）。"},
-  "walk":    {n:"步行摆臂觉察", t:3, dur:"2 分钟", cue:"正常走，注意两侧摆臂是否对称。", why:"把姿势觉察迁移到步态（通用常识）。"}
+  "ab":      {n:{zh:"腹式呼吸",en:"Belly breathing"}, t:1, dur:{zh:"90 秒 ×2",en:"90s ×2"}, cue:{zh:"手放腹部，鼻吸 4 秒、口呼 6 秒，肩膀不动。",en:"Hands on belly: inhale 4s through the nose, exhale 6s, shoulders still."}, why:{zh:"呼吸模式是姿势与核心激活的底层，也是每天最安全的起点（通用常识）。",en:"Breathing pattern underpins posture and core activation — and it's the safest way to start each day (general common sense)."}},
+  "lat":     {n:{zh:"侧向呼吸",en:"Lateral breathing"}, t:2, dur:{zh:"60 秒 ×2/侧",en:"60s ×2/side"}, cue:{zh:"手放肋侧，吸气把肋骨推向手掌，两侧对比。",en:"Hands on ribs; breathe into your palms and compare sides."}, why:{zh:"唤醒侧胸廓，两侧对比可觉察不对称（通用常识）。",en:"Wakes up the side ribcage; comparing sides reveals asymmetries (general common sense)."}},
+  "catcow":  {n:{zh:"猫牛式",en:"Cat-cow"}, t:1, dur:{zh:"8 次 ×2",en:"8 reps ×2"}, cue:{zh:"呼气弓背、吸气塌腰，动作放慢不追求幅度。",en:"Exhale round, inhale arch — slow, no need for range."}, why:{zh:"温和恢复脊柱分段活动度（通用常识）。",en:"Gently restores segmental spinal mobility (general common sense)."}},
+  "twist":   {n:{zh:"仰卧脊柱旋转",en:"Supine spinal twist"}, t:2, dur:{zh:"6 次 ×2/侧",en:"6 reps ×2/side"}, cue:{zh:"屈膝倒向一侧，双肩贴地，感受胸椎旋转。",en:"Knees to one side, shoulders down, feel the mid-back rotate."}, why:{zh:"仰卧位胸椎旋转活动度，两侧对比（通用常识）。",en:"Thoracic rotation in a safe lying position; compare sides (general common sense)."}},
+  "childs":  {n:{zh:"婴儿式放松",en:"Child's pose"}, t:2, dur:{zh:"60 秒",en:"60s"}, cue:{zh:"臀坐脚跟，手臂前伸，呼吸放到背部。",en:"Hips to heels, arms long, breathe into your back."}, why:{zh:"背部整体拉伸放松（通用常识）。",en:"Whole-back stretch and release (general common sense)."}},
+  "sidest":  {n:{zh:"站姿侧向拉伸",en:"Standing side stretch"}, t:1, dur:{zh:"30 秒 ×2/侧",en:"30s ×2/side"}, cue:{zh:"手臂过头向对侧弯，骨盆保持稳定不甩。",en:"Arm overhead, bend to the other side; keep the pelvis steady."}, why:{zh:"改善躯干两侧张力差异的对称练习（通用常识）。",en:"A symmetric exercise for side-of-trunk tension differences (general common sense)."}},
+  "wall":    {n:{zh:"靠墙站立检查",en:"Wall posture check"}, t:1, dur:{zh:"2 分钟",en:"2 min"}, cue:{zh:"后脑/上背/臀三点贴墙，收下颌，正常呼吸。",en:"Head, upper back and hips on the wall; chin tucked; breathe."}, why:{zh:"建立姿势基线，每天对照（通用常识）。",en:"Establishes a daily posture baseline (general common sense)."}},
+  "scap":    {n:{zh:"肩胛后缩",en:"Shoulder-blade squeeze"}, t:2, dur:{zh:"10 次 ×2",en:"10 reps ×2"}, cue:{zh:"挺胸夹背 2 秒再放松，不耸肩。",en:"Open the chest, squeeze 2s, relax — no shrugging."}, why:{zh:"激活上背姿势肌（通用常识）。",en:"Activates upper-back postural muscles (general common sense)."}},
+  "deadbug": {n:{zh:"死虫式",en:"Dead bug"}, t:2, dur:{zh:"6 次 ×2/侧",en:"6 reps ×2/side"}, cue:{zh:"腰贴地，对侧手脚缓慢伸展再收回。",en:"Low back flat; extend opposite arm and leg slowly."}, why:{zh:"抗伸展核心稳定，对腰背友好（通用常识）。",en:"Anti-extension core stability, kind to the low back (general common sense)."}},
+  "birddog": {n:{zh:"鸟狗式",en:"Bird dog"}, t:2, dur:{zh:"6 次 ×2/侧",en:"6 reps ×2/side"}, cue:{zh:"四足位，腰保持中立，手脚同起同落。",en:"On all fours, neutral spine; opposite arm and leg together."}, why:{zh:"抗旋转稳定与髋背协调（通用常识）。",en:"Anti-rotation stability plus hip–back coordination (general common sense)."}},
+  "plank":   {n:{zh:"跪姿平板",en:"Knee plank"}, t:3, dur:{zh:"20-30 秒 ×2",en:"20-30s ×2"}, cue:{zh:"肩腕垂直，收腹，塌腰即停。",en:"Shoulders over wrists, belly braced; stop if the back sags."}, why:{zh:"前链核心耐力，低负荷起步（通用常识）。",en:"Front-core endurance at a low load (general common sense)."}},
+  "sidebr":  {n:{zh:"跪姿侧桥",en:"Knee side plank"}, t:3, dur:{zh:"15 秒 ×2/侧",en:"15s ×2/side"}, cue:{zh:"肘膝支撑，髋部抬起与身体成一线。",en:"Elbow and knee support; lift hips into one line."}, why:{zh:"侧腹链耐力；方向性的强化需要专业评估后个性化，这里做对称练习（通用常识）。",en:"Side-chain endurance; directional work needs professional personalization — symmetric here (general common sense)."}},
+  "ham":     {n:{zh:"腘绳肌拉伸",en:"Hamstring stretch"}, t:2, dur:{zh:"45 秒/侧",en:"45s/side"}, cue:{zh:"微屈膝前屈，酸胀可忍、不痛。",en:"Soft knees, fold forward — tension ok, pain no."}, why:{zh:"释放骨盆后链张力（通用常识）。",en:"Releases back-of-hip tension (general common sense)."}},
+  "hip":     {n:{zh:"屈髋肌拉伸",en:"Hip flexor stretch"}, t:2, dur:{zh:"45 秒/侧",en:"45s/side"}, cue:{zh:"弓步，收腹收臀再前移。",en:"Lunge; brace the belly, squeeze glutes, then shift."}, why:{zh:"改善久坐屈髋张力（通用常识）。",en:"Undoes sitting-related hip-flexor tension (general common sense)."}},
+  "thor":    {n:{zh:"四足胸椎旋转",en:"Quadruped T-spine rotation"}, t:2, dur:{zh:"8 次 ×2/侧",en:"8 reps ×2/side"}, cue:{zh:"手扶头，肘去找对侧手腕。",en:"Hand behind head; elbow reaches to the opposite wrist."}, why:{zh:"胸椎旋转活动度（拉伸面）（通用常识）。",en:"Thoracic rotation mobility, stretch side (general common sense)."}},
+  "angel":   {n:{zh:"靠墙天使",en:"Wall angel"}, t:2, dur:{zh:"8 次 ×2",en:"8 reps ×2"}, cue:{zh:"背贴墙，手臂沿墙滑动，不耸腰。",en:"Back on the wall; slide the arms without arching."}, why:{zh:"肩胛上回旋模式练习（通用常识）。",en:"Trains upward-rotation of the shoulder blades (general common sense)."}},
+  "ytw":     {n:{zh:"俯卧 Y-T-W",en:"Prone Y-T-W"}, t:3, dur:{zh:"6 次 ×2",en:"6 reps ×2"}, cue:{zh:"沉肩，用肩胛带动手臂抬离地面。",en:"Shoulders down; lift the arms from the shoulder blades."}, why:{zh:"下斜方与肩袖姿势肌群（通用常识）。",en:"Lower-trap and rotator-cuff postural muscles (general common sense)."}},
+  "balance": {n:{zh:"单腿站立",en:"Single-leg stand"}, t:3, dur:{zh:"30 秒 ×2/侧",en:"30s ×2/side"}, cue:{zh:"髋水平，视线固定一点。",en:"Hips level, eyes on a fixed point."}, why:{zh:"姿势反射与本体感觉（通用常识）。",en:"Postural reflexes and proprioception (general common sense)."}},
+  "walk":    {n:{zh:"步行摆臂觉察",en:"Walking arm-swing awareness"}, t:3, dur:{zh:"2 分钟",en:"2 min"}, cue:{zh:"正常走，注意两侧摆臂是否对称。",en:"Walk normally; notice whether both arms swing the same."}, why:{zh:"把姿势觉察迁移到步态（通用常识）。",en:"Transfers posture awareness into gait (general common sense)."}}
 };
 const PHASES = [
-  {id:1, name:"适应与觉察", days:[1,6],  focus:"呼吸模式 · 脊柱活动度 · 姿势觉察"},
-  {id:2, name:"建立稳定",   days:[7,14], focus:"核心与背部耐力 · 对称性力量"},
-  {id:3, name:"巩固与迁移", days:[15,20],focus:"日常姿势迁移 · 自主练习能力"}
+  {id:1, days:[1,6],  name:{zh:"适应与觉察",en:"Adapt & notice"},  focus:{zh:"呼吸模式 · 脊柱活动度 · 姿势觉察",en:"Breathing · spinal mobility · posture awareness"}},
+  {id:2, days:[7,14], name:{zh:"建立稳定",en:"Build stability"}, focus:{zh:"核心与背部耐力 · 对称性力量",en:"Core & back endurance · symmetric strength"}},
+  {id:3, days:[15,20],name:{zh:"巩固与迁移",en:"Consolidate & transfer"}, focus:{zh:"日常姿势迁移 · 自主练习能力",en:"Into daily posture · self-directed practice"}}
 ];
 const PLAN = [
-  {d:1,  ex:["ab","catcow","wall"],                      focus:"呼吸与姿势基线"},
-  {d:2,  ex:["ab","catcow","twist","sidest","wall"],     focus:"脊柱活动度"},
-  {d:3,  ex:["ab","lat","catcow","sidest","scap","childs"], focus:"两侧对比觉察"},
-  {d:4,  ex:["ab","catcow","twist","sidest","scap","childs"], focus:"活动度 + 激活"},
-  {d:5,  ex:["ab","lat","deadbug","sidest","wall"],      focus:"核心入门"},
-  {d:6,  ex:["ab","catcow","twist","deadbug","sidest","childs"], focus:"阶段复盘 · 放松"},
-  {d:7,  ex:["ab","lat","catcow","deadbug","birddog","ham"], focus:"稳定起步"},
-  {d:8,  ex:["ab","catcow","twist","plank","deadbug","hip"], focus:"前链耐力"},
-  {d:9,  ex:["ab","lat","thor","birddog","ham","childs"], focus:"旋转与拉伸"},
-  {d:10, ex:["ab","catcow","sidest","birddog","plank","angel"], focus:"稳定递进"},
-  {d:11, ex:["ab","lat","deadbug","sidebr","ham","sidest"], focus:"侧链练习"},
-  {d:12, ex:["ab","catcow","thor","birddog","hip","childs"], focus:"胸椎专注"},
-  {d:13, ex:["ab","lat","plank","sidebr","ham","ytw"],   focus:"耐力组合"},
-  {d:14, ex:["ab","catcow","twist","birddog","sidest","childs"], focus:"半程复盘"},
-  {d:15, ex:["ab","lat","angel","deadbug","ham","sidest"], focus:"站姿迁移"},
-  {d:16, ex:["ab","catcow","thor","plank","sidebr","walk"], focus:"力量 + 旋转"},
-  {d:17, ex:["ab","lat","birddog","ytw","hip","sidest"], focus:"背侧组合"},
-  {d:18, ex:["ab","catcow","angel","balance","deadbug","childs"], focus:"平衡与本体感觉"},
-  {d:19, ex:["ab","lat","ham","ytw","sidebr","walk"],    focus:"收尾组合"},
-  {d:20, ex:["ab","wall","catcow","sidest","childs"],    focus:"自查与毕业"}
+  {d:1,  ex:["ab","catcow","wall"],                      focus:{zh:"呼吸与姿势基线",en:"Breathing & posture baseline"}},
+  {d:2,  ex:["ab","catcow","twist","sidest","wall"],     focus:{zh:"脊柱活动度",en:"Spinal mobility"}},
+  {d:3,  ex:["ab","lat","catcow","sidest","scap","childs"], focus:{zh:"两侧对比觉察",en:"Side-to-side awareness"}},
+  {d:4,  ex:["ab","catcow","twist","sidest","scap","childs"], focus:{zh:"活动度 + 激活",en:"Mobility + activation"}},
+  {d:5,  ex:["ab","lat","deadbug","sidest","wall"],      focus:{zh:"核心入门",en:"Core, first pass"}},
+  {d:6,  ex:["ab","catcow","twist","deadbug","sidest","childs"], focus:{zh:"阶段复盘 · 放松",en:"Phase review · release"}},
+  {d:7,  ex:["ab","lat","catcow","deadbug","birddog","ham"], focus:{zh:"稳定起步",en:"Stability begins"}},
+  {d:8,  ex:["ab","catcow","twist","plank","deadbug","hip"], focus:{zh:"前链耐力",en:"Front-core endurance"}},
+  {d:9,  ex:["ab","lat","thor","birddog","ham","childs"], focus:{zh:"旋转与拉伸",en:"Rotation & stretch"}},
+  {d:10, ex:["ab","catcow","sidest","birddog","plank","angel"], focus:{zh:"稳定递进",en:"Stability, stepped up"}},
+  {d:11, ex:["ab","lat","deadbug","sidebr","ham","sidest"], focus:{zh:"侧链练习",en:"Side chains"}},
+  {d:12, ex:["ab","catcow","thor","birddog","hip","childs"], focus:{zh:"胸椎专注",en:"T-spine focus"}},
+  {d:13, ex:["ab","lat","plank","sidebr","ham","ytw"],   focus:{zh:"耐力组合",en:"Endurance combo"}},
+  {d:14, ex:["ab","catcow","twist","birddog","sidest","childs"], focus:{zh:"半程复盘",en:"Halfway review"}},
+  {d:15, ex:["ab","lat","angel","deadbug","ham","sidest"], focus:{zh:"站姿迁移",en:"Into standing"}},
+  {d:16, ex:["ab","catcow","thor","plank","sidebr","walk"], focus:{zh:"力量 + 旋转",en:"Strength + rotation"}},
+  {d:17, ex:["ab","lat","birddog","ytw","hip","sidest"], focus:{zh:"背侧组合",en:"Back & sides"}},
+  {d:18, ex:["ab","catcow","angel","balance","deadbug","childs"], focus:{zh:"平衡与本体感觉",en:"Balance & proprioception"}},
+  {d:19, ex:["ab","lat","ham","ytw","sidebr","walk"],    focus:{zh:"收尾组合",en:"Closing combo"}},
+  {d:20, ex:["ab","wall","catcow","sidest","childs"],    focus:{zh:"自查与毕业",en:"Self-check & graduation"}}
 ];
 const HOOKS = {
-  progress:["记录今天的完成度——只和上周的自己比。","练后想一句：今天哪里比昨天轻松？","翻开总览看看进度条——那是三个星期前的你。"],
-  streak:["出勤本身就是胜利，延续你的连续记录。","今天只要求到场，前 3 个动作做完就算赢。","连续记录是一面镜子，照见你正在成为的人。"],
-  social:["约一个同伴互相报今天完成，或把完成发出去（自愿）。","把计划告诉一个会追问你进度的人。","找一位同路人，这 20 天一起走。"],
-  competition:["和上周的自己比赛：同样的动作，多坚持 5 秒就算赢。","给自己定个小赌注：这周完成 6 次训练。","本周目标写下来，贴在自己每天看得见的地方。"]
+  progress:{zh:["记录今天的完成度——只和上周的自己比。","练后想一句：今天哪里比昨天轻松？","翻开总览看看进度条——那是三个星期前的你。"],
+            en:["Log today's numbers — compare only with last week's you.","After training, name one thing that felt easier.","Open the overview — that progress bar is you, three weeks ago."]},
+  streak:{zh:["出勤本身就是胜利，延续你的连续记录。","今天只要求到场，前 3 个动作做完就算赢。","连续记录是一面镜子，照见你正在成为的人。"],
+          en:["Showing up is the win — keep the streak alive.","Today only asks you to arrive: first 3 moves and you've won.","The streak is a mirror of who you're becoming."]},
+  social:{zh:["约一个同伴互相报今天完成，或把完成发出去（自愿）。","找一位同路人，这 20 天一起走。","把计划告诉一个会问你进度的人。"],
+          en:["Team up with someone and swap daily check-ins (optional).","Find a buddy — walk these 20 days together.","Tell someone who'll ask you about it."]},
+  competition:{zh:["和上周的自己比赛：同样的动作，多坚持 5 秒就算赢。","给自己定个小赌注：这周完成 6 次训练。","本周目标写下来，贴在自己每天看得见的地方。"],
+          en:["Race last week's you: hold 5 seconds longer and you win.","Small wager with yourself: 6 sessions this week.","Write this week's target where you'll see it daily."]}
 };
 const FALLBACK = [
-  {id:"ab", dur:"60 秒", note:"两分钟启动版：只做这三件事"},
-  {id:"catcow", dur:"4 次", note:""},
-  {id:"wall", dur:"30 秒", note:""}
+  {id:"ab", dur:{zh:"60 秒",en:"60s"}},
+  {id:"catcow", dur:{zh:"4 次",en:"4 reps"}},
+  {id:"wall", dur:{zh:"30 秒",en:"30s"}}
 ];
 
-/* ---------------- 状态 ---------------- */
+/* ---------------- sound (WebAudio, offline, tiny) ---------------- */
+function chime(kind){
+  if(localStorage.getItem("mhSound") === "off") return;
+  try{
+    const C = window.AudioContext || window.webkitAudioContext; if(!C) return;
+    const ctx = new C(); const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = "sine"; o.frequency.value = kind === "warn" ? 330 : 660;
+    g.gain.value = .07; o.connect(g); g.connect(ctx.destination);
+    o.start();
+    o.frequency.exponentialRampToValueAtTime(kind === "warn" ? 262 : 990, ctx.currentTime + .22);
+    g.gain.exponentialRampToValueAtTime(.0008, ctx.currentTime + .4);
+    o.stop(ctx.currentTime + .45);
+  }catch(e){}
+}
+
+/* ---------------- state ---------------- */
 const KEY = "mhDemoV1";
 let S = null;
 try { S = JSON.parse(localStorage.getItem(KEY) || "null"); } catch(e) { S = null; }
@@ -149,19 +312,14 @@ const $nav = document.getElementById("nav");
 const $banners = document.getElementById("banners");
 let view = S ? "today" : "onboard";
 
-/* ---------------- 个性化逻辑（镜像 core 的规则） ---------------- */
+/* ---------------- personalization rules ---------------- */
 function recoveryCap(p){ return (p.sleep === "<6" || p.stress === "high"); }
-function startIntensity(p){
-  let base = p.level === "some" ? 0.65 : 0.5;
-  const cap = recoveryCap(p) ? 0.5 : (p.stress === "mid" ? 0.85 : 1.0);
-  return {v: Math.min(base, cap), capped: cap < base};
-}
 function tierMax(budget){ return budget <= 10 ? 1 : (budget <= 15 ? 2 : 3); }
 function isDone(d){ return !!(S && S.prog.days[d] && S.prog.days[d].done); }
 function isMissed(d){ return !!(S && S.prog.missed.includes(d)); }
 function currentDay(){
   for(let d=1; d<=20; d++){ if(!isDone(d) && !isMissed(d)) return d; }
-  return 21; // 毕业
+  return 21;
 }
 function phaseOf(d){ return PHASES.find(p => d >= p.days[0] && d <= p.days[1]); }
 function everHighPain(){ return Object.values(S.prog.days).some(r => r.done && r.pain >= 4); }
@@ -170,7 +328,7 @@ function completedEntries(){
 }
 function rpeTrendBars(){
   return completedEntries().map(x =>
-    `<span class="pnum ${x.r.rpe<=4?"low":(x.r.rpe>=7?"high":"")}" title="第 ${x.d} 天 RPE ${x.r.rpe}">${x.r.rpe}</span>`
+    `<span class="pnum ${x.r.rpe<=4?"low":(x.r.rpe>=7?"high":"")}" title="${t("dayOf", x.d)} RPE ${x.r.rpe}">${x.r.rpe}</span>`
   ).join(" ");
 }
 function streakCount(){
@@ -178,104 +336,108 @@ function streakCount(){
   for(let d = currentDay()-1; d >= 1; d--){ if(isDone(d)) n++; else break; }
   return n;
 }
-/* 首屏定律：打开任何界面，第一眼看到的是提升痕迹，不是待办清单（construction/philosophy.md §三） */
 function insightPanelHTML(){
   const es = completedEntries();
   let body;
   if(!es.length){
-    body = `<p>还没有记录——完成今天的训练，这里会出现你的<b>第一条提升曲线</b>。</p>
-      <p class="muted">爽必须真实：我们不展示假数据。</p>`;
+    body = `<p>${t("panelEmpty")}</p><p class="muted">${t("panelNoFake")}</p>`;
   } else {
     const first = es[0], last = es[es.length-1];
-    const trend = es.length === 1
-      ? `第 ${first.d} 天 RPE ${first.r.rpe} 已存——这是你的<b>基线</b>，下一次打卡起，这里会显示你变强的轨迹。`
-      : `RPE 轨迹 ${first.r.rpe} → ${last.r.rpe}${last.r.rpe < first.r.rpe ? "：<b>同样的练习更轻松了——你在变强。</b>" : (last.r.rpe > first.r.rpe ? "：近期更吃力——系统会按恢复预算自动校准难度，这不是你的问题。" : "：稳定巩固中。")}`;
+    const trend = es.length === 1 ? t("baseline", first.d, first.r.rpe)
+      : (last.r.rpe < first.r.rpe ? t("stronger", first.r.rpe, last.r.rpe)
+      : (last.r.rpe > first.r.rpe ? t("heavier", first.r.rpe, last.r.rpe) : t("steady", last.r.rpe)));
     const painMax = Math.max(...es.map(x => x.r.pain));
-    body = `<p>${trend}</p>
-      <p>${rpeTrendBars()}</p>
-      <p class="muted">完成 ${es.length}/20 · 连续 ${streakCount()} 次 · 疼痛最高 ${painMax}/10${painMax>=4?"（安全锁定中）":""} · 缺席 ${S.prog.missed.length} 次</p>`;
+    body = `<p>${trend}</p><p>${rpeTrendBars()}</p>
+      <p class="muted">${t("stats", es.length, streakCount(), painMax, painMax>=4?t("lockTag"):"")}</p>`;
   }
-  return `<div class="card"><h2>你的提升痕迹</h2>${body}
-    <p class="muted" style="font-size:13px">以上全部来自你的打卡数据，只保存在这台设备上。</p></div>`;
+  return `<div class="card"><h2>${IC.chart}${t("panelTitle")}</h2>${body}
+    <p class="muted" style="font-size:13px">${t("panelNoFake")}</p></div>`;
 }
-/* 完成反馈含义化：完成反馈优先呈现「这意味着什么提升」（philosophy §三.2） */
 function interpretResult(d){
   const r = S.prog.days[d];
-  if(r.pain >= 4) return "疼痛 ≥4：安全锁定已触发，计划已停止递进——先就医评估，这比任何进度都重要。";
+  if(r.pain >= 4) return t("interPain");
   const prevs = completedEntries().filter(x => x.d < d);
-  if(!prevs.length) return "这是你的第一条记录——它就是你的基线。下一次打卡起，这里会告诉你：你是在变强，还是在恢复。";
+  if(!prevs.length) return t("interFirst");
   const dr = r.rpe - prevs[prevs.length-1].r.rpe;
-  if(dr <= -2) return `RPE ${r.rpe-dr} → ${r.rpe}：明显更轻松——恢复跟上来了，明天按心流通道微调难度。`;
-  if(dr === -1) return `RPE ${r.rpe+1} → ${r.rpe}：稍微轻松了一点——方向是对的。`;
-  if(dr === 0)  return `RPE 稳定在 ${r.rpe}：同负荷同感受，基础在巩固。`;
-  return `RPE ${r.rpe-dr} → ${r.rpe}：比上次吃力。先查可控因素（睡眠/压力/动作质量），系统明天会自动帮你降一点难度——不是你的问题。`;
+  if(dr <= -2) return t("interEasy", r.rpe-dr, r.rpe);
+  if(dr === -1) return t("interSlight", r.rpe+1, r.rpe);
+  if(dr === 0)  return t("interSame", r.rpe);
+  return t("interHard", r.rpe-dr, r.rpe);
 }
 
-/* ---------------- 渲染 ---------------- */
-function render(){
+/* ---------------- render ---------------- */
+function renderChrome(){
+  document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+  document.getElementById("hSub").textContent = "· " + t("brandSub");
+  document.getElementById("hMain").textContent = t("mainLink");
+  document.getElementById("tab-today").innerHTML = IC.cal + " " + t("tabToday");
+  document.getElementById("tab-plan").innerHTML = IC.chart + " " + t("tabPlan");
+  document.getElementById("tab-about").innerHTML = IC.book + " " + t("tabAbout");
+  document.getElementById("reset").textContent = t("reset");
+  document.getElementById("langBtn").textContent = lang === "zh" ? "EN" : "中文";
+  document.getElementById("foot").textContent = t("footer");
+  document.getElementById("nav").hidden = !S;
   document.getElementById("reset").hidden = !S;
-  $nav.hidden = !S;
-  if(!S){ renderOnboard(); return; }
+}
+function render(){
+  renderChrome();
   $banners.innerHTML = "";
-  if(S.profile.assessed === "no"){
-    $banners.innerHTML += `<div class="banner warn">你尚未做过专业评估。脊柱侧弯的专向训练（如施罗斯疗法）需要专业评估与认证指导；这里只安排通用的对称运动与拉伸常识。建议先就医评估。</div>`;
-  }
-  if(everHighPain()){
-    $banners.innerHTML += `<div class="banner dan">你的训练记录中出现过疼痛 ≥4。按安全规则，计划已停止递进并保持恢复版强度；建议就医评估后再继续。</div>`;
-  }
+  if(!S){ renderOnboard(); return; }
+  if(S.profile.assessed === "no")
+    $banners.innerHTML += `<div class="banner warn">${t("bannerNoEval")}</div>`;
+  if(everHighPain())
+    $banners.innerHTML += `<div class="banner dan">${t("bannerEverPain")}</div>`;
   if(view === "today") renderToday();
   else if(view === "plan") renderPlan();
-  else renderWhy();
+  else renderAbout();
 }
-
 function renderOnboard(){
   const qs = [
-    {k:"assessed", q:"是否已由医院/专业机构评估过脊柱侧弯（方向、程度）？", why:"未评估的话，我们会持续提醒你先就医评估，并且只安排通用练习。"},
-    {k:"pain", q:"目前的背部疼痛情况？", why:"疼痛记录会触发保护规则。", opts:[["no","基本无疼痛"],["some","偶发酸痛"],["often","经常疼痛"]]},
-    {k:"time", q:"每天能稳定投入多少分钟？", why:"计划会按这个时长安排每天的内容量。", opts:[["10","10 分钟"],["15","15 分钟"],["20","20 分钟"],["30","30 分钟"]]},
-    {k:"sleep", q:"平均每晚睡眠？", why:"睡得少的日子，计划会自动变轻。", opts:[["<6","少于 6 小时"],["6-7","6–7 小时"],["7-8","7–8 小时"],["8+","8 小时以上"]]},
-    {k:"stress", q:"近期生活压力？", why:"压力大的时候，计划会自动变轻。", opts:[["low","低"],["mid","中"],["high","高"]]},
-    {k:"level", q:"规律运动基础？", why:"决定从多轻开始。", opts:[["none","基本没有"],["some","有一些"]]},
-    {k:"style", q:"什么最让你把一件事坚持下去？", why:"用来挑选适合你的鼓励方式。", opts:[["progress","看得见的进步"],["streak","连续打卡记录"],["social","同伴与陪伴"],["competition","和自己竞赛"]]}
+    {k:"assessed", q:{zh:"是否已由医院/专业机构评估过脊柱侧弯（方向、程度）？",en:"Has your scoliosis been assessed by a professional (curve/direction)?"}, why:{zh:"未评估的话，我们会持续提醒你先就医评估，并且只安排通用练习。",en:"If not, we'll keep reminding you to get assessed and only include general exercises."}, opts:{yes:{zh:"已评估",en:"Assessed"}, no:{zh:"未评估",en:"Not yet"}}},
+    {k:"pain", q:{zh:"目前的背部疼痛情况？",en:"Current back pain?"}, why:{zh:"疼痛记录会触发保护规则。",en:"Pain records trigger protection rules."}, opts:{no:{zh:"基本无疼痛",en:"Almost none"}, some:{zh:"偶发酸痛",en:"Occasional soreness"}, often:{zh:"经常疼痛",en:"Frequent pain"}}},
+    {k:"time", q:{zh:"每天能稳定投入多少分钟？",en:"Minutes you can reliably invest per day?"}, why:{zh:"计划会按这个时长安排每天的内容量。",en:"The plan sizes each day to this."}, opts:[["10","10"],["15","15"],["20","20"],["30","30"]], suffix:{zh:"分钟",en:"min"}},
+    {k:"sleep", q:{zh:"平均每晚睡眠？",en:"Average sleep per night?"}, why:{zh:"睡得少的日子，计划会自动变轻。",en:"Short-sleep days get lighter sessions automatically."}, opts:{"<6":{zh:"少于 6 小时",en:"Under 6h"},"6-7":{zh:"6–7 小时",en:"6–7h"},"7-8":{zh:"7–8 小时",en:"7–8h"},"8+":{zh:"8 小时以上",en:"8h+"}}},
+    {k:"stress", q:{zh:"近期生活压力？",en:"Recent life stress?"}, why:{zh:"压力大的时候，计划会自动变轻。",en:"High-stress periods get lighter sessions."}, opts:{low:{zh:"低",en:"Low"}, mid:{zh:"中",en:"Mid"}, high:{zh:"高",en:"High"}}},
+    {k:"level", q:{zh:"规律运动基础？",en:"Regular exercise background?"}, why:{zh:"决定从多轻开始。",en:"Sets how light we start."}, opts:{none:{zh:"基本没有",en:"Almost none"}, some:{zh:"有一些",en:"Some"}}},
+    {k:"style", q:{zh:"什么最让你把一件事坚持下去？",en:"What keeps you going the longest?"}, why:{zh:"用来挑选适合你的鼓励方式。",en:"Picks the encouragement style that fits you."}, opts:{progress:{zh:"看得见的进步",en:"Visible progress"}, streak:{zh:"连续打卡记录",en:"An unbroken streak"}, social:{zh:"同伴与陪伴",en:"Company & accountability"}, competition:{zh:"和自己竞赛",en:"Competing with yourself"}}}
   ];
-  let html = `<h1>开始之前：了解你这一个人</h1>
-    <p class="muted">7 个问题，每个都对应一个会因此不同的决策（最小提问原则）。答案只存在你的浏览器里。</p>
-    <div class="card">`;
+  let html = `<h1>${t("obTitle")}</h1><p class="muted">${t("obSub")}</p><div class="card">`;
   for(const q of qs){
-    html += `<div class="q"><p>${q.q} <span class="why">— ${q.why}</span></p>`;
-    (q.opts || []).forEach(([v, label]) => {
-      html += `<label class="opt"><input type="radio" name="${q.k}" value="${v}" required> ${label}</label>`;
-    });
-    if(q.k === "assessed"){
-      html += `<label class="opt"><input type="radio" name="assessed" value="yes" required> 已评估（可在备注写方向/程度）</label>
-               <label class="opt"><input type="radio" name="assessed" value="no" required> 未评估</label>`;
+    html += `<div class="q"><p>${tx(q.q)} <span class="why">— ${tx(q.why)}</span></p>`;
+    const opts = q.opts;
+    if(Array.isArray(opts)){
+      opts.forEach(([v,label]) => {
+        html += `<label class="opt"><input type="radio" name="${q.k}" value="${v}" required> ${label}${q.suffix ? " " + tx(q.suffix) : ""}</label>`;
+      });
+    } else {
+      for(const [v,label] of Object.entries(opts)){
+        html += `<label class="opt"><input type="radio" name="${q.k}" value="${v}" required> ${tx(label)}</label>`;
+      }
     }
     html += `</div>`;
   }
-  html += `<p><button class="primary" id="go">生成我的 20 天计划</button></p></div>`;
+  html += `<p><button class="primary" id="go">${IC.play} ${t("go")}</button></p></div>`;
   $app.innerHTML = html;
   document.getElementById("go").addEventListener("click", () => {
     const p = {};
-  for(const q of qs){
-    const el = document.querySelector(`input[name="${q.k}"]:checked`);
-    if(!el){ alert(`请选择：${q.q}`); return; }
-    p[q.k] = el.value;
-  }
+    for(const q of qs){
+      const el = document.querySelector(`input[name="${q.k}"]:checked`);
+      if(!el){ alert(`${t("needPick")} ${tx(q.q)}`); return; }
+      p[q.k] = el.value;
+    }
     S = {profile:p, prog:{days:{}, missed:[]}, ts:Date.now()};
-    save(); view = "today"; render();
+    save(); view = "today"; render(); chime("done");
   });
 }
-
 function exListHTML(ids, fallbackMode){
-  return ids.map(id => {
+  return `<p class="muted" style="margin:0 0 6px">${IC.flame} ${t("warm")}</p>` + ids.map(id => {
     const e = EX[id];
     const dur = fallbackMode ? (FALLBACK.find(f=>f.id===id)||{}).dur || e.dur : e.dur;
-    return `<div class="ex"><div class="head"><span class="name">${e.n}</span><span class="dur">${dur}</span></div>
-      <p class="cue">要点：${e.cue}</p>
-      <details><summary>为什么练这个？</summary><p class="muted">${e.why}</p></details></div>`;
+    return `<div class="ex"><div class="head"><span class="name">${IC.play} ${tx(e.n)}</span><span class="dur">${tx(dur)}</span></div>
+      <p class="cue"><span class="muted">${lang==="zh"?"要点":"Cue"}：</span>${tx(e.cue)}</p>
+      <details><summary>${t("whyTitle")}</summary><p class="muted">${tx(e.why)}</p></details></div>`;
   }).join("");
 }
-
 function renderToday(){
   const d = currentDay();
   if(d > 20){ renderGrad(); return; }
@@ -287,33 +449,32 @@ function renderToday(){
   let list, note = "";
   if(fallbackMode && !isDone(d)){
     list = exListHTML(FALLBACK.map(f=>f.id), true);
-    note = `<div class="banner warn">昨天缺席——今天自动回落到<b>两分钟启动版</b>（不补课、不惩罚）。做完就算完成，先回来，再继续。</div>`;
+    note = `<div class="banner warn">${t("fallbackNote")}</div>`;
   } else if(recovery){
     const ids = day.ex.filter(id => EX[id].t === 1);
     list = exListHTML(ids, false);
-    note = locked
-      ? `<div class="banner dan"><b>安全锁定中</b>：出现过疼痛 ≥4 → 只保留基础动作，停止加量；建议就医评估后再恢复完整训练。</div>`
-      : `<div class="banner warn"><b>今日为轻量版</b>：睡眠不足或压力大的时候，计划会自动变轻——只保留基础动作。这不是偷懒，是计划的一部分。</div>`;
+    note = locked ? `<div class="banner dan">${t("lockNote")}</div>`
+                  : `<div class="banner warn">${t("recoverNote")}</div>`;
   } else {
     const ids = day.ex.filter(id => EX[id].t <= tm);
     list = exListHTML(ids, false);
-    if(ids.length < day.ex.length) note = `<p class="muted">按你的 ${S.profile.time} 分钟预算，今天安排了其中的 ${ids.length} 项。</p>`;
+    if(ids.length < day.ex.length) note = `<p class="muted">${t("budgetNote", S.profile.time, ids.length)}</p>`;
   }
   const style = S.profile.style;
-  const hook = HOOKS[style][d % HOOKS[style].length];
+  const hook = tx(HOOKS[style][d % HOOKS[style].length]);
   const done = isDone(d);
   $app.innerHTML = `
-    <h1>第 ${d} / 20 天 <span class="tag">${ph.name}</span><span class="tag">${day.focus}</span></h1>
+    <h1>${t("dayOf", d)} <span class="tag">${tx(ph.name)}</span><span class="tag">${tx(day.focus)}</span></h1>
     ${note || ""}
     <div class="card">${list}</div>
     <div class="card">
-      <h2>${done ? "今日已完成" : "完成后打卡"}</h2>
+      <h2>${IC.check}${done ? t("done") : t("checkin")}</h2>
       ${done ? doneCard(d) : `
-      <p><label>自觉强度 RPE（1-10，越轻松越低）<br><select id="rpe">${[1,2,3,4,5,6,7,8,9,10].map(v=>`<option ${v===5?"selected":""}>${v}</option>`).join("")}</select></label></p>
-      <p><label>训练中背部疼痛（0-10；≥4 会触发安全规则）<br><select id="pain">${[0,1,2,3,4,5,6,7,8,9,10].map(v=>`<option ${v===0?"selected":""}>${v}</option>`).join("")}</select></label></p>
-      <p><label>一句感受（可选）<input type="text" id="note" placeholder="例如：转身比昨天顺畅"></label></p>
-      <p><button class="primary" id="done">提交打卡</button>
-         <button class="ghost" id="skip">今天跳过（记为缺席）</button></p>
+      <p><label>${t("rpe")}<br><select id="rpe">${[1,2,3,4,5,6,7,8,9,10].map(v=>`<option ${v===5?"selected":""}>${v}</option>`).join("")}</select></label></p>
+      <p><label>${t("painL")}<br><select id="pain">${[0,1,2,3,4,5,6,7,8,9,10].map(v=>`<option ${v===0?"selected":""}>${v}</option>`).join("")}</select></label></p>
+      <p><label>${t("noteL")}<input type="text" id="note" placeholder="${t("notePh")}"></label></p>
+      <p><button class="primary" id="done">${IC.check} ${t("submit")}</button>
+         <button class="ghost" id="skip">${t("skip")}</button></p>
       <p class="muted">✦ ${hook}</p>`}
     </div>
     ${insightPanelHTML()}`;
@@ -322,87 +483,74 @@ function renderToday(){
       const rpe = +document.getElementById("rpe").value;
       const pain = +document.getElementById("pain").value;
       const note2 = document.getElementById("note").value.trim();
-      S.prog.days[d] = {done:true, rpe, pain, note:note2, ts:Date.now(),
-                        fallbackOnly: fallbackMode};
-      save(); render();
+      S.prog.days[d] = {done:true, rpe, pain, note:note2, ts:Date.now(), fallbackOnly: fallbackMode};
+      save(); chime(pain >= 4 ? "warn" : "done"); render();
     });
     document.getElementById("skip").addEventListener("click", () => {
-      if(confirm("记为缺席？明天会自动回落到两分钟启动版。")){
-        S.prog.missed.push(d); save(); render();
-      }
+      if(confirm(t("skipConfirm"))){ S.prog.missed.push(d); save(); render(); }
     });
   }
 }
-
 function doneCard(d){
   const r = S.prog.days[d];
   const style = S.profile.style;
-  const hook = HOOKS[style][(d+1) % HOOKS[style].length];
-  return `<div class="banner ok">完成 ✓　RPE ${r.rpe} · 疼痛 ${r.pain}${r.note ? " · 「" + r.note + "」" : ""}</div>
+  const hook = tx(HOOKS[style][(d+1) % HOOKS[style].length]);
+  return `<div class="banner ok">${t("doneBanner")}　RPE ${r.rpe} · ${t("thPain")} ${r.pain}${r.note ? " · 「" + r.note + "」" : ""}</div>
     <p><b>${interpretResult(d)}</b></p>
     <p>${rpeTrendBars()}</p>
     <p class="muted">✦ ${hook}</p>
-    <p><button data-go="plan">看 20 天总览</button></p>`;
+    <p><button data-go="plan">${t("viewPlan")}</button></p>`;
 }
-
 function renderGrad(){
-  $app.innerHTML = `<h1>20 天完成 🎉</h1>
-    <div class="card"><p>这是 demo 的终点，也是真实产品的起点：</p>
-    <p>1. 建议带着这 20 天的记录（总览页可截图）<b>就医做专业评估</b>——专向训练（如施罗斯）需要认证指导；</p>
-    <p>2. 评估后，真实系统会按评估数据重建个性化计划（本 demo 只含通用对称练习）；</p>
-    <p>3. 想继续维持：重复阶段三的内容，或把练习拆进日常。</p>
-    <p><button data-go="plan">回总览</button></p></div>`;
+  $app.innerHTML = `<h1>${t("gradTitle")}</h1>
+    <div class="card">${t("gradBody")}
+    <p><button data-go="plan">${t("backPlan")}</button></p></div>`;
 }
-
 function renderPlan(){
   const rows = PLAN.map(p => {
     const r = S.prog.days[p.d];
-    const st = r && r.done ? (r.fallbackOnly ? "回落版 ✓" : "完成 ✓") : (isMissed(p.d) ? "缺席" : (p.d === currentDay() ? "今天" : "—"));
-    const pain = r && r.done ? `<span class="pnum ${r.pain>=4?"high":(r.pain>0?"low":"")}">${r.pain}</span>` : "—";
-    const rpe = r && r.done ? r.rpe : "—";
-    return `<tr><td>${p.d}</td><td>${phaseOf(p.d).name}</td><td>${p.focus}</td><td>${st}</td><td>${rpe}</td><td>${pain}</td></tr>`;
+    const st = r && r.done ? (r.fallbackOnly ? (lang==="zh"?"回落版 ✓":"Restart ✓") : (lang==="zh"?"完成 ✓":"Done ✓"))
+             : (isMissed(p.d) ? t("stMissed") : (p.d === currentDay() ? t("stToday") : t("stDash")));
+    const pain = r && r.done ? `<span class="pnum ${r.pain>=4?"high":(r.pain>0?"low":"")}">${r.pain}</span>` : t("stDash");
+    const rpe = r && r.done ? r.rpe : t("stDash");
+    return `<tr><td>${p.d}</td><td>${tx(phaseOf(p.d).name)}</td><td>${tx(p.focus)}</td><td>${st}</td><td>${rpe}</td><td>${pain}</td></tr>`;
   }).join("");
   const doneN = PLAN.filter(p => isDone(p.d)).length;
-  let streak = 0;
-  for(let d=20; d>=1; d--){ if(isDone(d)) streak++; else break; }
   const pains = PLAN.map(p => S.prog.days[p.d]).filter(r => r && r.done).map(r => r.pain);
   const painMax = pains.length ? Math.max(...pains) : null;
   $app.innerHTML = `
-    <h1>20 天总览</h1>
+    <h1>${IC.chart} ${t("planTitle")}</h1>
     <div class="card">
-      <p><b>完成 ${doneN}/20</b> · 当前连击 ${streak}${recoveryCap(S.profile) || everHighPain() ? " · <b>恢复版强度</b>（硬规则生效中）" : ""}${painMax !== null && painMax >= 4 ? " · <b style='color:var(--dan-ink)'>疼痛信号已触发安全锁定</b>" : ""}</p>
+      <p><b>${t("doneN", doneN)}</b> · ${t("streakN", streakCount())}${(recoveryCap(S.profile)||everHighPain()) ? " · " + (lang==="zh"?"轻量强度（保护规则生效中）":"light intensity (protection active)") : ""}${painMax !== null && painMax >= 4 ? " · <b style='color:var(--dan-ink)'>" + (lang==="zh"?"疼痛信号已触发安全锁定":"pain triggered the safety lock") + "</b>" : ""}</p>
       <div class="bar"><i style="width:${doneN/20*100}%"></i></div>
-      <p class="muted">反指标（thinking-in-systems）：缺席 ${S.prog.missed.length} 次 · 疼痛最高 ${painMax === null ? "—" : painMax}/10。完成率不是唯一指标——疼痛与缺席同样在面板上。</p>
+      <p class="muted">${t("anti", S.prog.missed.length, painMax===null?"—":painMax)}</p>
     </div>
-    <div class="card"><table><thead><tr><th>天</th><th>阶段</th><th>焦点</th><th>状态</th><th>RPE</th><th>疼痛</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    <div class="card"><table><thead><tr><th>${t("thDay")}</th><th>${t("thPhase")}</th><th>${t("thFocus")}</th><th>${t("thSt")}</th><th>${t("thRpe")}</th><th>${t("thPain")}</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
-
-function renderWhy(){
+function renderAbout(){
   $app.innerHTML = `
-    <h1>关于这个计划</h1>
-    <p class="muted">这个平台只有一个目标：让你清楚地看见自己在一天天变强。</p>
-    <div class="card"><h2>它是怎么设计的</h2>
-      <p>20 天分三个阶段：<b>先适应、再稳定、后巩固</b>。每个动作都为「让脊柱在日常姿势里更有支撑」服务；强度按周缓慢递增，最后一周主动减量——变强发生在恢复里，不在硬撑里。</p>
-      <p class="muted">每个动作旁边都可以点开「为什么练这个」。练习内容为通用运动常识，不构成医疗处方。</p></div>
-    <div class="card"><h2>保护规则</h2>
-      <p><b>自动轻量</b>：睡眠不足或压力大的时候，计划自动变轻——恢复和训练一样重要。</p>
-      <p><b>疼痛就停</b>：疼痛达到 4 分及以上，计划停止加量并建议就医。疼痛和酸痛是两回事。</p>
-      <p><b>缺席不惩罚</b>：中断后第二天自动回到两分钟版本——先回来，再继续。</p></div>
-    <div class="card"><h2>你的数据</h2>
-      <p>所有打卡记录只保存在这台设备上，用来让下一期计划更贴合你；想重新开始，随时点右上角「重置」一键删除。</p></div>
-    <div class="card"><h2>边界</h2>
-      <p>脊柱侧弯的专向训练（如施罗斯疗法）需要专业评估与认证指导。这个计划只提供通用的对称练习——如果还没做过评估，请先就医。</p></div>`;
+    <h1>${IC.book} ${t("aboutTitle")}</h1>
+    <p class="muted">${t("aboutSub")}</p>
+    <div class="card"><h2>${IC.play}${t("how")}</h2>
+      <p>${t("howP")}</p><p class="muted">${t("howP2")}</p></div>
+    <div class="card"><h2>${IC.shield}${t("rules")}</h2>
+      <p>${t("r1")}</p><p>${t("r2")}</p><p>${t("r3")}</p></div>
+    <div class="card"><h2>${IC.db}${t("yourData")}</h2><p>${t("dataP")}</p></div>
+    <div class="card"><h2>${IC.info}${t("bound")}</h2><p>${t("boundP")}</p></div>`;
 }
 
-/* ---------------- 事件 ---------------- */
-function goClick(e){
+/* ---------------- events ---------------- */
+$nav.addEventListener("click", e => {
   const b = e.target.closest("button[data-go]");
   if(b){ view = b.dataset.go; render(); }
-}
-$nav.addEventListener("click", goClick);
-$app.addEventListener("click", goClick);
+});
+document.getElementById("langBtn").addEventListener("click", () => {
+  lang = lang === "zh" ? "en" : "zh";
+  localStorage.setItem("mhLang", lang); render();
+});
 document.getElementById("reset").addEventListener("click", () => {
-  if(confirm("清空本机数据并重新开始？")){ localStorage.removeItem(KEY); S = null; view = "onboard"; render(); }
+  const msg = lang === "zh" ? "清空本机数据并重新开始？" : "Delete all local data and start over?";
+  if(confirm(msg)){ localStorage.removeItem(KEY); S = null; view = "onboard"; render(); }
 });
 render();
 </script>
