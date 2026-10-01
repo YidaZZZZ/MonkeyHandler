@@ -47,17 +47,37 @@ def _load_llm():
 class Bridge:
     """暴露给页面 JS（window.pywebview.api）的 Python 桥。"""
 
+    DATA_HOME = Path.home() / ".monkeyhandler"
+
     def __init__(self, ui_dir: Path, llm=None):
         self.ui_dir = Path(ui_dir).resolve()
         self.llm = llm
-        self.instances_dir = self.ui_dir / "instances"
+        # N2 数据户口：实例与数据一律住用户主目录，仓库工作树只放代码与知识资产
+        self.instances_dir = self.DATA_HOME / "instances"
         self.instances_dir.mkdir(parents=True, exist_ok=True)
+        self._migrate_legacy()
         self.manifest = self.instances_dir / "manifest.json"
+
+    def _migrate_legacy(self) -> None:
+        old = self.ui_dir / "instances"
+        old_manifest = old / "manifest.json"
+        if not old_manifest.exists() or self.manifest.exists():
+            return
+        for f in old.glob("*.html"):
+            (self.instances_dir / f.name).write_bytes(f.read_bytes())
+        self.manifest.write_text(old_manifest.read_text(encoding="utf-8"), encoding="utf-8")
+        for f in old.glob("*"):
+            f.unlink()
+        old_manifest.unlink(missing_ok=True)
+        try:
+            old.rmdir()
+        except OSError:
+            pass
 
     # ---- 生成 ---------------------------------------------------------
     def generate(self, goal: str, days: int = 20, time: int = 20,
                  sleep: float = 7.5, stress: str = "mid", level: str = "none",
-                 pain: str = "no", style: str = "progress") -> dict:
+                 pain: str = "no", style: str = "progress", history: str = "") -> dict:
         goal = (goal or "").strip()
         if not goal:
             return {"ok": False, "error": "请先写一句目标。"}
@@ -77,7 +97,7 @@ class Bridge:
             "time_budget": str(time * 7),
         }
         try:
-            user, spec, via = gen.generate(goal, answers, horizon_days=int(days))
+            user, spec, via = gen.generate(goal, answers, horizon_days=int(days), history=history)
         except Exception as e:
             return {"ok": False, "error": f"生成失败：{e}"}
         slug = _slug(goal)

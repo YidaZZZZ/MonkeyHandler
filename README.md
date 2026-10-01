@@ -14,11 +14,11 @@ AI 驱动的**个体化学习/训练工作台**开源框架（Python）。
 
 **副产品**：开发者框架（src/ 引擎与协议、构筑体系、测试）。
 
-**待审核队列**：[docs/review-queue.md](docs/review-queue.md)（53 项：36 本著作 + 8 件 synthesis + 9 件构筑文档，分三批）。
+**审核台账**：[docs/review-queue.md](docs/review-queue.md)（53 项已于 2026-09-30 全部批准；新增条目逐项送审，每月抽查 5 项复审）。
 
 **训练计划平台是阶段性产物**：因需求而生、随目标完成而归档，其数据沉淀回元平台——MonkeyHandler 因此越用越有效。
 
-> **诚实声明（2026-09-30）**：① 「生成」能力当前处于建设初期——现有实例 demo 为**手工产出**，生成链路（画像→自动生成实例）已授权两周内打通（D4，见路线图）；② 当前一切效果主张均为 **n=1 自实验**（创始人为唯一用户），随访数据通道自 M3 起建立；③ 前身项目 **guanzi（罐子）**——本地多模型觉察工作台，其「见/格」方法论已并入本项目的觉察引擎（D2 裁决），仓库归档为前身并保留致敬。
+> **诚实声明（2026-10-01 更新）**：① 生成链路**已打通**（2026-09-30 CLI、2026-10-01 桌面窗口内生成，真实 Key 验证成功）——内容质量仍在打磨期；② 当前一切效果主张均为 **n=1 自实验**（创始人为唯一用户），随访数据通道自 M3 起建立；③ 前身项目 **guanzi（罐子）**——本地多模型觉察工作台，其「见/格」方法论已并入本项目的觉察引擎（D2 裁决），仓库归档为前身并保留致敬。
 
 （English TL;DR: MonkeyHandler is a Python framework for building human-friendly, individualized training workbenches. It pairs a book-derived model of human nature — universal mechanisms plus individual-difference dimensions — with an evidence-based user profile, pluggable cited domain research, and motivation-aware plan generation with an execution feedback loop.）
 

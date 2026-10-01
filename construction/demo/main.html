@@ -134,7 +134,7 @@ const L = {
     openInst2:"打开训练界面", genH:"＋ 基于新需求，生成一个新的训练平台", genSub:"生成一个专属训练平台的过程（能力建设中）：",
     s1:"① 说出目标", s1b:"用一句话描述你想达成的改变", s2:"② 回答几个问题", s2b:"只问会影响计划的问题：时间、睡眠、疼痛、什么最能让你坚持",
     s3:"③ 得到专属平台", s3b:"每天的内容、强度与鼓励方式都为你调整", s4:"④ 越用越懂你", s4b:"你的打卡让下一期更贴合你的身体与生活",
-    genNote:"生成链路已打通（命令行版，2026-09-30）：主平台内直接生成即将上线——现在可体验首个实例「20 天脊柱侧弯」。",
+    genNote:"生成直接在本窗口完成；你的打卡数据留在本机，并会在下一次生成时被引用——越用越懂你。",
     posNote:"训练计划平台为你的具体目标而生，完成后自动归档；这个主平台则长期陪伴——呈现你的提升，并让每一次训练都更懂你。",
     growH1:"为什么它会越来越懂你", growSub:"这不是一个固定的训练模板——它被设计为随着你的使用而成长。",
     g1:"你的每一次打卡，都在训练「它」", g1b:"昨天睡得少，今天就轻一点；连续缺席，第二天只要求两分钟；同样的动作变轻松了，难度就悄悄往上调。这些调整围绕你的恢复、感受与进步持续发生。",
@@ -261,9 +261,29 @@ const KEY = "mhDemoV1";
 let S = null;
 try { S = JSON.parse(localStorage.getItem(KEY) || "null"); } catch(e) {}
 function entries(){
-  if(!S || !S.prog) return [];
-  return [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
-    .map(d => ({d, r: S.prog.days[d]})).filter(x => x.r && x.r.done);
+  /* 回程数据流：聚合所有训练平台（mhInst-*）+ 内置示例的打卡记录 */
+  const out = [];
+  for(let i = 0; i < localStorage.length; i++){
+    const k = localStorage.key(i);
+    if(!k || !k.startsWith("mhInst-")) continue;
+    try{
+      const st = JSON.parse(localStorage.getItem(k) || "null");
+      if(!st || !st.days) continue;
+      const src = k.replace("mhInst-", "").slice(0, 12);
+      Object.values(st.days).filter(r => r.done).forEach(r => out.push({...r, src}));
+    }catch(e){}
+  }
+  const legacy = (JSON.parse(localStorage.getItem("mhDemoV1") || "null") || {}).prog;
+  if(legacy) Object.values(legacy.days).filter(r => r.done).forEach(r => out.push({...r, src: "内置示例"}));
+  return out.sort((a, b) => (a.ts || 0) - (b.ts || 0));
+}
+function collectHistory(){
+  const es = entries();
+  if(!es.length) return "";
+  const painMax = Math.max(...es.map(x => x.pain));
+  const avg = (es.reduce((a, x) => a + x.rpe, 0) / es.length).toFixed(1);
+  const sources = [...new Set(es.map(x => x.src))].length;
+  return `共完成 ${es.length} 次训练（来自 ${sources} 个训练平台）；平均 RPE ${avg}；疼痛最高 ${painMax}/10。`;
 }
 function streak(){
   if(!S || !S.prog) return 0;
@@ -694,12 +714,13 @@ async function doGenerate(){
   const days = +document.getElementById("genDays").value;
   const time = +document.getElementById("genTime").value;
   const prof = (JSON.parse(localStorage.getItem("mhDemoV1") || "null") || {}).profile || {};
+  const history = collectHistory();
   const btn = document.getElementById("genBtn");
   btn.disabled = true; setGenMsg(t("genBusy"));
   try{
     const res = await window.pywebview.api.generate(goal, days, time,
       parseFloat(prof.sleep || "7.5"), prof.stress || "mid", prof.training_experience || "none",
-      prof.pain || "no", prof.motivation_style || "progress");
+      prof.pain || "no", prof.motivation_style || "progress", history);
     if(res && res.ok){
       setGenMsg(t("genDone"));
       refreshGenList();

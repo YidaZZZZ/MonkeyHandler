@@ -67,17 +67,18 @@ class InstanceGenerator:
         self.questionnaire().collect(answers, user)
         return user
 
-    def generate(self, goal: str, answers: dict[str, str], horizon_days: int = 20) -> tuple[UserModel, InstanceSpec, str]:
+    def generate(self, goal: str, answers: dict[str, str], horizon_days: int = 20,
+                 history: str = "") -> tuple[UserModel, InstanceSpec, str]:
         if self.llm is None:
             raise LLMUnavailable(
-                "未配置 LLM：请用 --ai-config 传入配置 JSON，或设置 MONKEYHANDLER_LLM_BASE_URL / "
-                "MONKEYHANDLER_LLM_API_KEY / MONKEYHANDLER_LLM_MODEL（主平台「设置」页生成的配置可直接导出使用）。"
+                "现在还生成不了：这台设备还没有连接 AI 服务。"
+                "打开主平台 → 设置，填好接口地址和密钥（约一分钟）就好。"
             )
         user = self.build_profile(goal, answers)
         sleep = float(user.text("sleep_hours", "7.5") or 7.5)
         stress = user.text("stress_level", "mid") or "mid"
         cap = recovery_budget(sleep, stress)
-        spec = self._llm_spec(user, goal, horizon_days, cap)
+        spec = self._llm_spec(user, goal, horizon_days, cap, history=history)
         return user, spec, "llm"
 
     GEN_SYSTEM = (
@@ -87,7 +88,8 @@ class InstanceGenerator:
         "出现疼痛类内容时以停止与就医建议回应。只输出合法 JSON，无 markdown 围栏。"
     )
 
-    def _llm_spec(self, user: UserModel, goal: str, horizon: int, cap: float) -> InstanceSpec:
+    def _llm_spec(self, user: UserModel, goal: str, horizon: int, cap: float,
+                  history: str = "") -> InstanceSpec:
         level = (user.text("training_experience", "none") or "none").strip().lower()
         base = {"none": 0.5, "some": 0.65, "experienced": 0.75}.get(level, 0.5)
         base_prompt = (
@@ -98,7 +100,8 @@ class InstanceGenerator:
             f"- 输出长度纪律（防截断）：why 每项 ≤14 字且相邻天可重复；cue ≤18 字；focus ≤16 字；rationale ≤80 字\n"
             f"- 语言纪律：所有字段用中文；phase 用中文命名（例：适应期/稳定期/巩固期）；dur 用中文格式（例：「30 秒 ×2/侧」「8 次 ×2」）\n"
             f"- 三阶段推进（适应→稳定→巩固），末段安排减量日；rationale 说明依据\n"
-            f"- 安全：通用运动常识；不承诺治愈；不使用医疗断言\n\n"
+            f"- 若提供了既往执行数据：rationale 必须至少引用其中一项具体观察，并说明本期据此做了什么调整\n\n"
+            f"既往执行数据（本机回程，来自 TA 过去的训练平台）：\n{history or '（首期，无既往记录）'}\n\n"
             "输出 JSON 结构："
             '{"goal": str, "horizon_days": int, "intensity": float, "rationale": str, '
             '"days": [{"day": int, "phase": str, "focus": str, '
@@ -115,7 +118,10 @@ class InstanceGenerator:
                 return spec
             except Exception as e:
                 last_err = str(e)
-        raise LLMUnavailable(f"LLM 输出连续 {self.MAX_ATTEMPTS} 次未通过校验：{last_err}")
+        raise LLMUnavailable(
+            f"AI 连续两次给出的计划都无法使用（{last_err}）。请重试一次；"
+            f"如果反复出现，到设置里换一个模型，或者稍后再试。"
+        )
 
     @staticmethod
     def _validate(spec: InstanceSpec, horizon: int, cap: float) -> None:

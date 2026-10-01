@@ -119,7 +119,8 @@ def generate(
         path = _pl.Path(out)
     else:
         stamp = _dt.datetime.now().strftime("%Y%m%d-%H%M")
-        path = _pl.Path("instances") / f"instance-{stamp}.html"
+        data_home = _pl.Path.home() / ".monkeyhandler" / "instances"
+        path = data_home / f"instance-{stamp}.html"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(html, encoding="utf-8")
     typer.echo(f"已生成实例：{path}")

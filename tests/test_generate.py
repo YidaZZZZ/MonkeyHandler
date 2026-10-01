@@ -40,7 +40,7 @@ def _gen(llm) -> InstanceGenerator:
 
 def test_no_llm_raises_clearly() -> None:
     gen = _gen(None)
-    with pytest.raises(LLMUnavailable, match="未配置 LLM"):
+    with pytest.raises(LLMUnavailable, match="还没有连接 AI 服务"):
         gen.generate(GOAL, FitnessPack.sample_answers(), horizon_days=20)
 
 
@@ -76,7 +76,7 @@ def test_llm_invalid_then_valid_retries_with_feedback() -> None:
 def test_llm_persistently_invalid_raises() -> None:
     bad = json.dumps({"goal": "x", "horizon_days": 9, "intensity": 0.5, "rationale": "r", "days": []})
     llm = ScriptedLLM([bad, bad])
-    with pytest.raises(LLMUnavailable, match="连续 2 次未通过校验"):
+    with pytest.raises(LLMUnavailable, match="连续两次给出的计划都无法使用"):
         _gen(llm).generate("增肌", FitnessPack.sample_answers(), horizon_days=3)
 
 
@@ -85,3 +85,17 @@ def test_pain_answer_records_safety() -> None:
     answers = {**FitnessPack.sample_answers(), "injuries": "腰间盘突出史"}
     user, _, _ = _gen(llm).generate(GOAL, answers, horizon_days=5)
     assert user.text("injuries") == "腰间盘突出史"
+
+
+def test_history_reaches_prompt() -> None:
+    """N3 回程最小闭环：既往执行数据必须进入 LLM 的提示词。"""
+    captured = {}
+    class Cap:
+        def complete_json(self, system, user, schema):
+            captured["user"] = user
+            return schema.model_validate_json(json.dumps(_valid(3), ensure_ascii=False))
+    gen = _gen(llm=Cap())
+    gen.generate("改善睡眠", FitnessPack.sample_answers(), horizon_days=3,
+                 history="既往训练平台执行记录（本机回程）：共完成 6 次训练；平均 RPE 4.2；疼痛最高 5/10。")
+    assert "共完成 6 次训练" in captured["user"]
+    assert "必须至少引用其中一项具体观察" in captured["user"]
