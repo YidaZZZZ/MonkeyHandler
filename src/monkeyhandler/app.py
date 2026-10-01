@@ -55,8 +55,8 @@ class Bridge:
         # N2 数据户口：实例与数据一律住用户主目录，仓库工作树只放代码与知识资产
         self.instances_dir = self.DATA_HOME / "instances"
         self.instances_dir.mkdir(parents=True, exist_ok=True)
-        self._migrate_legacy()
         self.manifest = self.instances_dir / "manifest.json"
+        self._migrate_legacy()
 
     def _migrate_legacy(self) -> None:
         old = self.ui_dir / "instances"
