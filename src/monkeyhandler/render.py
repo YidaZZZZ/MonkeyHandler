@@ -153,9 +153,13 @@ render();
 """
 
 
-def render_instance(goal: str, spec: InstanceSpec, user: UserModel, via: str) -> str:
-    """把 InstanceSpec 渲染为单页自包含 HTML 实例（数据仅存本机浏览器）。"""
-    slug = _slug(goal)
+def render_instance(goal: str, spec: InstanceSpec, user: UserModel, via: str,
+                    storage_key: str | None = None) -> str:
+    """把 InstanceSpec 渲染为单页自包含 HTML 实例（数据仅存本机浏览器）。
+
+    storage_key：本实例在浏览器 localStorage 中的隔离键；缺省由目标+时间派生。
+    """
+    slug = storage_key or _slug(goal)
     data = spec.model_dump()
     data["taper_from"] = spec.horizon_days - max(2, round(spec.horizon_days * 0.1)) + 1
     title = f"MonkeyHandler 训练平台 · {_truncate(goal, 24)}"
