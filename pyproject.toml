@@ -18,6 +18,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
+app = ["pywebview>=5.0"]
 
 [project.scripts]
 monkeyhandler = "monkeyhandler.cli:main"

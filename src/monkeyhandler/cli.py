@@ -127,6 +127,18 @@ def generate(
     typer.echo("双击该文件即可在浏览器中使用；数据仅保存在本机浏览器。")
 
 
+@app.command()
+def app() -> None:
+    """启动独立桌面窗口（主平台 + 训练平台，不依附浏览器）。"""
+    from .app import launch
+    try:
+        mode = launch()
+    except RuntimeError as e:
+        typer.secho(str(e), fg=typer.colors.RED)
+        raise typer.Exit(1)
+    typer.echo(f"窗口已关闭（{mode}）。")
+
+
 def main() -> None:
     app()
 
