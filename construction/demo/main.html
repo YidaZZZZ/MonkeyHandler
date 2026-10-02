@@ -111,8 +111,8 @@ button.open{background:linear-gradient(180deg,#128077,#0f6e66);box-shadow:0 1px 
 "use strict";
 /* ---------------- language ---------------- */
 let lang = localStorage.getItem("mhLang") ||
-const APP_VERSION = "v0.1.0";
   ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
+const APP_VERSION = "v0.1.0";
 const L = {
   zh:{
     brandSub:"主平台 · 呈现与生产", openInst:"打开训练平台 →",
@@ -275,11 +275,11 @@ function entries(){
       const st = JSON.parse(localStorage.getItem(k) || "null");
       if(!st || !st.days) continue;
       const src = k.replace("mhInst-", "").slice(0, 12);
-      Object.values(st.days).filter(r => r.done).forEach(r => out.push({...r, src}));
+      Object.entries(st.days).filter(([dk, r]) => r.done).forEach(([dk, r]) => out.push({...r, day: +dk, src}));
     }catch(e){}
   }
   const legacy = (JSON.parse(localStorage.getItem("mhDemoV1") || "null") || {}).prog;
-  if(legacy) Object.values(legacy.days).filter(r => r.done).forEach(r => out.push({...r, src: "内置示例"}));
+  if(legacy) Object.entries(legacy.days).filter(([dk, r]) => r.done).forEach(([dk, r]) => out.push({...r, day: +dk, src: "内置示例"}));
   return out.sort((a, b) => (a.ts || 0) - (b.ts || 0));
 }
 function collectHistory(){
@@ -315,13 +315,13 @@ function sparkline(es){
   if(es.length < 2) return "";  const w=560, h=96, pad=8;
   const pts = es.map((x,i) => [
     pad + i*((w-2*pad)/(es.length-1)),
-    h - pad - ((x.r.rpe-1)/9)*(h-2*pad)
+    h - pad - ((x.rpe-1)/9)*(h-2*pad)
   ]);
   const line = pts.map(p=>p.map(v=>v.toFixed(1)).join(",")).join(" ");
   const dots = es.map((x,i) =>
-    `<circle cx="${pts[i][0].toFixed(1)}" cy="${pts[i][1].toFixed(1)}" r="4" fill="#0f766e"><title>${t("dayShort")} ${x.d} · ${t("rpeShort")} ${x.r.rpe}</title></circle>`).join("");
-  const l1 = `<text x="${pts[0][0]}" y="${h-1}" font-size="11" fill="#5b6b76">${t("dayShort")}1 ${t("rpeShort")} ${es[0].r.rpe}</text>`;
-  const l2 = `<text x="${pts[pts.length-1][0]-56}" y="${h-1}" font-size="11" fill="#5b6b76">${t("dayShort")}${es[es.length-1].d} ${t("rpeShort")} ${es[es.length-1].r.rpe}</text>`;
+    `<circle cx="${pts[i][0].toFixed(1)}" cy="${pts[i][1].toFixed(1)}" r="4" fill="#0f766e"><title>${t("dayShort")} ${x.day} · ${t("rpeShort")} ${x.rpe}</title></circle>`).join("");
+  const l1 = `<text x="${pts[0][0]}" y="${h-1}" font-size="11" fill="#5b6b76">${t("dayShort")}1 ${t("rpeShort")} ${es[0].rpe}</text>`;
+  const l2 = `<text x="${pts[pts.length-1][0]-56}" y="${h-1}" font-size="11" fill="#5b6b76">${t("dayShort")}${es[es.length-1].day} ${t("rpeShort")} ${es[es.length-1].rpe}</text>`;
   return `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="${t("chartAria")}">
     <polyline points="${line}" fill="none" stroke="#0f766e" stroke-width="2.5" stroke-linejoin="round"/>${dots}${l1}${l2}</svg>`;
 }
@@ -355,12 +355,12 @@ function render(){
 }
 function viewOver(){
   const es = entries();
-  const pain = es.length ? Math.max(...es.map(x=>x.r.pain)) : null;
+  const pain = es.length ? Math.max(...es.map(x=>x.pain)) : null;
   let trend;
   if(!es.length) trend = t("overNone");
-  else if(es.length === 1) trend = t("trendBaseline", es[0].d, es[0].r.rpe);
+  else if(es.length === 1) trend = t("trendBaseline", es[0].day, es[0].rpe);
   else {
-    const a = es[0].r.rpe, b = es[es.length-1].r.rpe;
+    const a = es[0].rpe, b = es[es.length-1].rpe;
     trend = b < a ? t("trendDown", a, b) : (b > a ? t("trendUp", a, b) : t("trendFlat", b));
   }
   const noEval = S && S.profile && S.profile.assessed === "no";
