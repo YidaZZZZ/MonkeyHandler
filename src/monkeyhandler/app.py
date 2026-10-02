@@ -15,6 +15,7 @@ import json as _json
 import os
 import shutil
 import subprocess
+import sys
 import urllib.request as _request
 from pathlib import Path
 
@@ -149,6 +150,10 @@ def _slug(goal: str) -> str:
 # 窗口启动
 # ---------------------------------------------------------------------------
 def find_ui_dir() -> Path | None:
+    # ① PyInstaller 打包资源（_MEIPASS/ui，由 build_exe.py --add-data 提供）
+    meipass = getattr(sys, "_MEIPASS", None)
+    if meipass and (Path(meipass) / "ui" / "main.html").exists():
+        return Path(meipass) / "ui"
     here = Path(__file__).resolve()
     for base in (here.parents[2], Path.cwd()):
         cand = base / "construction" / "demo"
