@@ -98,7 +98,6 @@ button.open{background:linear-gradient(180deg,#128077,#0f6e66);box-shadow:0 1px 
     <button class="tab" data-v="over" id="t-over"></button>
     <button class="tab" data-v="inst" id="t-inst"></button>
     <button class="tab" data-v="see" id="t-see"></button>
-    <button class="tab" data-v="grow" id="t-grow"></button>
     <button class="tab" data-v="set" id="t-set"></button>
     <button class="open" id="openInst"></button>
     <button class="ghost" id="langBtn"></button>
@@ -116,7 +115,7 @@ const APP_VERSION = "v0.1.0";
 const L = {
   zh:{
     brandSub:"主平台 · 呈现与生产", openInst:"打开训练平台 →",
-    tOver:"提升总览", tInst:"我的训练平台", tGrow:"越来越懂你", tSet:"设置",
+    tOver:"提升总览", tInst:"我的训练平台",tSet:"设置",
     footer:"MonkeyHandler 主平台 · 你的所有训练数据只保存在这台设备上，用于让你的下一期训练更贴合你。",
     overH1:"提升总览", overSub:"你所有训练平台的提升，都汇集在这里。",
     stDone:"累计完成训练", stStreak:"当前连续次数", stPain:"疼痛最高（0-10）", stMiss:"缺席次数",
@@ -137,10 +136,6 @@ const L = {
     s3:"③ 得到专属平台", s3b:"每天的内容、强度与鼓励方式都为你调整", s4:"④ 越用越懂你", s4b:"你的打卡让下一期更贴合你的身体与生活",
     genNote:"生成直接在本窗口完成；你的打卡数据留在本机，并会在下一次生成时被引用——越用越懂你。",
     posNote:"训练计划平台为你的具体目标而生，完成后自动归档；这个主平台则长期陪伴——呈现你的提升，并让每一次训练都更懂你。",
-    growH1:"为什么它会越来越懂你", growSub:"这不是一个固定的训练模板——它被设计为随着你的使用而成长。",
-    g1:"你的每一次打卡，都在训练「它」", g1b:"昨天睡得少，今天就轻一点；连续缺席，第二天只要求两分钟；同样的动作变轻松了，难度就悄悄往上调。这些调整围绕你的恢复、感受与进步持续发生。",
-    g2:"方法有出处", g2b:"计划背后的练习与原则来自经过验证的运动科学与行为研究，并有专门的审核流程——没有出处的方法，不会进入你的计划。",
-    g3:"数据属于你", g3b:"所有记录只保存在这台设备上；它们只有一个用途：让你的下一期训练更贴合你。想重新开始，随时一键删除。",
     setH1:"设置", setLang:"界面语言 / Language", setAi:"连接 AI 服务（可选）",
     aiExplain:"连接后可生成个性化建议与解读。密钥只保存在这台设备的浏览器里，不会上传到除你所选服务之外的任何地方。",
     provider:"服务商", key:"API 密钥（本机保存）", base:"接口地址（OpenAI 兼容）", model:"模型名称",
@@ -181,7 +176,7 @@ const L = {
   },
   en:{
     brandSub:"Main platform · present & produce", openInst:"Open training app →",
-    tOver:"Progress", tInst:"My training apps", tGrow:"Why it learns you", tSet:"Settings",
+    tOver:"Progress", tInst:"My training apps",tSet:"Settings",
     footer:"MonkeyHandler main platform · all your training data stays on this device and is only used to fit your next cycle better.",
     overH1:"Progress", overSub:"Improvement across all your training apps, gathered in one place.",
     stDone:"Sessions done", stStreak:"Current streak", stPain:"Pain max (0-10)", stMiss:"Missed",
@@ -202,10 +197,6 @@ const L = {
     s3:"③ Get your own app", s3b:"Daily content, intensity and encouragement tuned to you", s4:"④ It learns you", s4b:"Your check-ins make the next cycle fit your body and life",
     genNote:"Demo stage: the generator is still being built — for now, try the “20-day scoliosis” training app.",
     posNote:"Training apps exist for one goal at a time, then archive; this main platform stays with you — showing your progress and making every cycle fit better.",
-    growH1:"Why it learns you", growSub:"This is not a fixed template — it is designed to grow with your use.",
-    g1:"Every check-in trains it", g1b:"Poor sleep yesterday → lighter today; missed days → a two-minute restart; same moves feeling easier → difficulty quietly steps up. These adjustments follow your recovery, feelings and progress.",
-    g2:"Methods have sources", g2b:"The exercises and principles behind your plan come from validated exercise and behavioral science, with a dedicated review process — methods without sources never reach your plan.",
-    g3:"Your data is yours", g3b:"Everything stays on this device with one purpose: fitting your next cycle better. Reset anytime to delete it all.",
     setH1:"Settings", setLang:"Interface language / 界面语言", setAi:"Connect an AI service (optional)",
     aiExplain:"Once connected, the platform can generate personalized suggestions and interpretations. Your key stays in this device's browser — it is sent nowhere except the service you choose.",
     provider:"Provider", key:"API key (stored locally)", base:"Endpoint (OpenAI-compatible)", model:"Model name",
@@ -331,14 +322,13 @@ let view = "over";
 function renderChrome(){
   document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
   document.getElementById("hSub").textContent = "· " + t("brandSub");
-  ["over","inst","see","grow","set"].forEach(v => {
+  ["over","inst","see","set"].forEach(v => {
     const b = document.getElementById("t-"+v);
     b.classList.toggle("active", view === v);
   });
   document.getElementById("t-over").innerHTML = IC.chart + " " + t("tOver");
   document.getElementById("t-inst").innerHTML = IC.grid + " " + t("tInst");
   document.getElementById("t-see").innerHTML = IC.heart + " " + t("tSee");
-  document.getElementById("t-grow").innerHTML = IC.spark + " " + t("tGrow");
   document.getElementById("t-set").innerHTML = IC.gear + " " + t("tSet");
   document.getElementById("openInst").textContent = t("openInst");
   document.getElementById("langBtn").textContent = t("langBtn");
@@ -350,7 +340,6 @@ function render(){
   if(view === "over") app.innerHTML = viewOver();
   else if(view === "inst"){ app.innerHTML = viewInst(); refreshGenList(); }
   else if(view === "see") app.innerHTML = viewSee();
-  else if(view === "grow") app.innerHTML = viewGrow();
   else app.innerHTML = viewSet();
 }
 function viewOver(){
@@ -414,12 +403,6 @@ function viewInst(){
       <p class="muted small">${t("genNote")}</p>
     </div>
     <div class="card"><p class="muted small">${t("posNote")}</p></div>`;
-}
-function viewGrow(){
-  return `<h1>${IC.spark} ${t("growH1")}</h1><p class="sub">${t("growSub")}</p>
-    <div class="card"><h2>${IC.heart}${t("g1")}</h2><p>${t("g1b")}</p></div>
-    <div class="card"><h2>${IC.shield}${t("g2")}</h2><p>${t("g2b")}</p></div>
-    <div class="card"><h2>${IC.db}${t("g3")}</h2><p>${t("g3b")}</p></div>`;
 }
 function viewSet(){
   const cfg = JSON.parse(localStorage.getItem("mhAiCfg") || "null") || {provider:"glm", base:"", key:"", model:""};
