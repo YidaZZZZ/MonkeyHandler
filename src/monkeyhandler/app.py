@@ -129,6 +129,14 @@ class Bridge:
     def list_instances(self) -> dict:
         return {"instances": self._manifest()["instances"]}
 
+    def export_data(self, data_json: str) -> dict:
+        """N13/D14：把页面汇总的导出 JSON 落到数据户口 exports/。"""
+        out_dir = self.DATA_HOME / "exports"
+        out_dir.mkdir(parents=True, exist_ok=True)
+        path = out_dir / f"export-{_dt.datetime.now().strftime('%Y%m%d-%H%M%S')}.json"
+        path.write_text(data_json, encoding="utf-8")
+        return {"ok": True, "path": str(path)}
+
     def open_uri(self, uri: str) -> None:
         import webview
         if len(webview.windows) < 6:

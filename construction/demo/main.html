@@ -111,6 +111,7 @@ button.open{background:linear-gradient(180deg,#128077,#0f6e66);box-shadow:0 1px 
 "use strict";
 /* ---------------- language ---------------- */
 let lang = localStorage.getItem("mhLang") ||
+const APP_VERSION = "v0.1.0";
   ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
 const L = {
   zh:{
@@ -147,6 +148,8 @@ const L = {
     testOk:"连接成功 ✓", testFail:"连接失败：", testNeed:"请先填写接口地址、密钥与模型名称并保存。",
     testHint:"如果失败，可能是网络原因或该服务不支持浏览器直接调用——不影响本地功能的使用。",
     sound:"完成音效", on:"开", off:"关", dataSec:"数据", dataP:"所有数据保存在本机浏览器；清除数据请在训练平台右上角「重置」。",
+    exportBtn:"导出全部数据（JSON）", exportDone:"已导出 ✓ ", exportFail:"导出失败：",
+    versionL:"版本",
     langBtn:()=>lang==="zh"?"EN":"中文",
     dayShort:"第", rpeShort:"RPE",
     errPrefix:"错误：", netErr:"网络/跨域限制，无法从浏览器直接调用该服务（不影响本地功能）。",
@@ -210,6 +213,8 @@ const L = {
     testOk:"Connection OK ✓", testFail:"Connection failed: ", testNeed:"Fill in endpoint, key and model, then save first.",
     testHint:"If it fails, it may be network or the service not allowing direct browser calls — local features are unaffected.",
     sound:"Completion sound", on:"On", off:"Off", dataSec:"Data", dataP:"Everything lives in this browser; clear data via “Reset” in the training app's top bar.",
+    exportBtn:"Export all data (JSON)", exportDone:"Exported ✓ ", exportFail:"Export failed: ",
+    versionL:"Version",
     langBtn:()=>lang==="zh"?"EN":"中文",
     dayShort:"Day", rpeShort:"RPE",
     errPrefix:"Error: ", netErr:"Network or cross-origin restriction: this service can't be called directly from a browser (local features are unaffected).",
@@ -460,6 +465,9 @@ function viewSet(){
     <div class="card">
       <h2>${t("dataSec")}</h2>
       <p class="muted small">${t("dataP")}</p>
+      <p style="margin:10px 0 0"><button id="exportBtn">${t("exportBtn")}</button></p>
+      <p class="hint" id="exportMsg" aria-live="polite"></p>
+      <p class="muted small">MonkeyHandler ${APP_VERSION}</p>
     </div>`;
 }
 /* settings interactions (delegated, works across re-renders) */
@@ -494,7 +502,37 @@ document.getElementById("app").addEventListener("click", async e => {
     localStorage.setItem("mhSound", on ? "off" : "on");
     render();
   }
+  if(e.target.id === "exportBtn") exportAll();
 });
+async function exportAll(){
+  const dump = {
+    exported_at: new Date().toISOString(),
+    app_version: APP_VERSION,
+    profile: JSON.parse(localStorage.getItem("mhDemoV1") || "null"),
+    see: {session: JSON.parse(localStorage.getItem("mhSeeSess") || "null"),
+          cards: JSON.parse(localStorage.getItem("mhSeeCards") || "[]")},
+    instances: {}
+  };
+  for(let i = 0; i < localStorage.length; i++){
+    const k = localStorage.key(i);
+    if(k && k.startsWith("mhInst-")) dump.instances[k] = JSON.parse(localStorage.getItem(k) || "null");
+  }
+  const payload = JSON.stringify(dump, null, 2);
+  const msg = document.getElementById("exportMsg");
+  if(hasBridge()){
+    try{
+      const res = await window.pywebview.api.export_data(payload);
+      if(msg) msg.textContent = res && res.ok ? (t("exportDone") + " " + res.path) : (t("exportFail") + ((res && res.error) || "?"));
+    }catch(err){ if(msg) msg.textContent = t("exportFail") + err; }
+  } else {
+    const blob = new Blob([payload], {type: "application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "monkeyhandler-export.json";
+    a.click();
+    if(msg) msg.textContent = t("exportDone") + "（浏览器下载）";
+  }
+}
 document.getElementById("app").addEventListener("change", e => {
   if(e.target.id === "prov"){
     const map = {"glm":["https://open.bigmodel.cn/api/paas/v4","glm-4-flash"],
