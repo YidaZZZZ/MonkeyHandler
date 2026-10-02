@@ -1,0 +1,46 @@
+MonkeyHandler v0.1.0 · 使用说明 / Read me
+=============================================
+
+【中文】
+这是什么？
+  一个本地优先的双引擎陪伴平台：
+  · 「被看见」——无评判的倾诉与梳理空间（纸笔模式 + 可选 AI 陪伴对话），本心卡片与足迹
+  · 「训练平台」——为你的具体目标生成的训练计划（首个内置方向：20 天脊柱侧弯运动与拉伸），打卡与进度
+  · 主平台可基于你的一句话目标，生成新的训练平台
+
+怎么用（三步）？
+  1. 双击 MonkeyHandler.exe（推荐 Windows 10/11，Chrome/Edge 内核环境）；
+  2. 首次使用：打开「我的训练平台」→ 回答几个问题 → 生成你的训练平台；
+  3. 「设置」页可切换中文/English、连接你自己的 AI 服务（密钥只存本机）。
+
+你的数据在哪里？
+  全部保存在这台设备的浏览器存储里，不上传、无账号。
+  清除数据：训练平台右上角「重置」。
+
+安全边界（重要）
+  练习内容为通用运动常识，不构成医疗处方。
+  脊柱侧弯的专向训练（如施罗斯疗法）需要专业评估与认证指导。
+  如果出现伤害自己的念头：心理援助热线 12356（中国，24 小时），或当地急诊。
+
+可选：连接 AI 服务
+  「设置」→ 选择服务商（阿里百炼/OpenAI/DeepSeek/Ollama/自定义）→ 填入你自己的密钥并测试。
+
+【English】
+What is this?
+  A local-first companion platform with two engines:
+  · "Being seen" — a judgment-free space for sorting out your thoughts (paper mode + optional AI companion), heart cards and a trail.
+  · "Training apps" — plans generated for your concrete goal (first built-in: 20-day scoliosis exercise & stretch), with check-ins and progress.
+
+How to use (3 steps):
+  1. Double-click MonkeyHandler.exe (Windows 10/11 recommended);
+  2. Open "我的训练平台" → answer a few questions → generate your training app;
+  3. Settings: switch 中文/English and connect your own AI service (key stays on this device).
+
+Data & privacy
+  Everything stays in this device's browser storage. No upload, no account.
+  Generation sends your goal text and a profile summary to the AI service you choose — see the outbound data list in the repository.
+
+Safety
+  Exercises are general fitness common sense, not medical advice.
+  Scoliosis-specific training (e.g. Schroth) requires professional assessment and certified guidance.
+  If you have thoughts of harming yourself: contact your local crisis line or emergency services. You are not alone.
