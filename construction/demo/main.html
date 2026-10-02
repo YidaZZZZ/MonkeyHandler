@@ -134,7 +134,6 @@ const L = {
     openInst2:"打开训练界面", genH:"＋ 基于新需求，生成一个新的训练平台", genSub:"生成一个专属训练平台的过程（能力建设中）：",
     s1:"① 说出目标", s1b:"用一句话描述你想达成的改变", s2:"② 回答几个问题", s2b:"只问会影响计划的问题：时间、睡眠、疼痛、什么最能让你坚持",
     s3:"③ 得到专属平台", s3b:"每天的内容、强度与鼓励方式都为你调整", s4:"④ 越用越懂你", s4b:"你的打卡让下一期更贴合你的身体与生活",
-    genNote:"生成直接在本窗口完成；你的打卡数据留在本机，并会在下一次生成时被引用——越用越懂你。",
     posNote:"训练计划平台为你的具体目标而生，完成后自动归档；这个主平台则长期陪伴——呈现你的提升，并让每一次训练都更懂你。",
     setH1:"设置", setLang:"界面语言 / Language", setAi:"连接 AI 服务（可选）",
     aiExplain:"连接后可生成个性化建议与解读。密钥只保存在这台设备的浏览器里，不会上传到除你所选服务之外的任何地方。",
@@ -195,7 +194,6 @@ const L = {
     openInst2:"Open the training app", genH:"＋ Generate a new training app from a goal", genSub:"How a personal training app comes to life (capability in build):",
     s1:"① Say the goal", s1b:"One sentence describing the change you want", s2:"② Answer a few questions", s2b:"Only questions that shape the plan: time, sleep, pain, what keeps you going",
     s3:"③ Get your own app", s3b:"Daily content, intensity and encouragement tuned to you", s4:"④ It learns you", s4b:"Your check-ins make the next cycle fit your body and life",
-    genNote:"Demo stage: the generator is still being built — for now, try the “20-day scoliosis” training app.",
     posNote:"Training apps exist for one goal at a time, then archive; this main platform stays with you — showing your progress and making every cycle fit better.",
     setH1:"Settings", setLang:"Interface language / 界面语言", setAi:"Connect an AI service (optional)",
     aiExplain:"Once connected, the platform can generate personalized suggestions and interpretations. Your key stays in this device's browser — it is sent nowhere except the service you choose.",
@@ -400,9 +398,7 @@ function viewInst(){
       <p id="genMsg" aria-live="polite" style="min-height:1.2em"></p>
       ${hasBridge() ? "" : `<div class="banner warn" style="margin:12px 0 0">${t("genNeedDesktop")}</div>`}
       <div id="genList" style="margin-top:8px"></div>
-      <p class="muted small">${t("genNote")}</p>
-    </div>
-    <div class="card"><p class="muted small">${t("posNote")}</p></div>`;
+    </div>`;
 }
 function viewSet(){
   const cfg = JSON.parse(localStorage.getItem("mhAiCfg") || "null") || {provider:"glm", base:"", key:"", model:""};
