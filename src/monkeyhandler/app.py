@@ -76,13 +76,20 @@ class Bridge:
             pass
 
     # ---- 生成 ---------------------------------------------------------
+    LOG_DIR = DATA_HOME / "logs"
+
     def generate(self, goal: str, days: int = 20, time: int = 20,
                  sleep: float = 7.5, stress: str = "mid", level: str = "none",
                  pain: str = "no", style: str = "progress", history: str = "") -> dict:
+        import datetime as _dt2
         goal = (goal or "").strip()
-        if not goal:
-            return {"ok": False, "error": "请先写一句目标。"}
+        log = self.LOG_DIR / "generate.log"
+        self.LOG_DIR.mkdir(parents=True, exist_ok=True)
+        def _log(msg: str) -> None:
+            with log.open("a", encoding="utf-8") as f:
+                f.write(f"[{_dt2.datetime.now().isoformat(timespec='seconds')}] {msg}\n")
         llm = self.llm or _load_llm()
+        _log(f"开始生成：goal={goal!r} days={days} time={time}")
         if llm is None:
             return {"ok": False, "error": "尚未连接 AI 服务：请到「设置」页填入接口地址与密钥。"}
         gen = InstanceGenerator(self.pack_for(goal), llm=llm)
@@ -99,7 +106,9 @@ class Bridge:
         }
         try:
             user, spec, via = gen.generate(goal, answers, horizon_days=int(days), history=history)
+            _log(f"生成成功：via={via} 天数={len(spec.days)}")
         except Exception as e:
+            _log(f"生成失败：{type(e).__name__}: {e}")
             return {"ok": False, "error": f"生成失败：{e}"}
         slug = _slug(goal)
         html = render_instance(goal=goal, spec=spec, user=user, via=via, storage_key=slug)
