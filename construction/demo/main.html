@@ -168,6 +168,7 @@ const L = {
     genGoalL:"你的目标（一句话）", genGoalP:"例：二十天缓解腰背僵硬，恢复日常活动",
     genDays:"周期（天）", genTime:"每天（分钟）", genBtn:"生成我的训练平台",
     genBusy:"生成中——AI 正在调研并编排你的计划（调研三本著作 + 编排约需 2-4 分钟），可以离开一会儿。",
+    genStageResearch:"调研领域著作中",
     genDone:"生成完成 ✓ 已在新窗口打开；它也在下方列表里。",
     genFail:"生成失败：", genNeedGoal:"请先写一句目标。",
     genNeedDesktop:"生成功能需要在桌面模式（MonkeyHandler.bat 启动的窗口）中使用。",
@@ -228,6 +229,7 @@ const L = {
     genGoalL:"Your goal (one sentence)", genGoalP:"e.g. 20 days to ease back stiffness and return to daily life",
     genDays:"Cycle (days)", genTime:"Minutes per day", genBtn:"Generate my training app",
     genBusy:"Generating — the AI is researching and composing your plan (researching three works + composing, about 2-4 minutes). Feel free to step away.",
+    genStageResearch:"Researching domain works",
     genDone:"Done ✓ Opened in a new window; it's also in the list below.",
     genFail:"Generation failed: ", genNeedGoal:"Write your goal first.",
     genNeedDesktop:"Generation is available in the desktop window (launched via MonkeyHandler.bat).",
@@ -396,6 +398,10 @@ function viewInst(){
           <select id="genTime">${[10,15,20,30].map(v=>`<option ${v===20?"selected":""}>${v}</option>`).join("")}</select></div>
       </div>
       <p style="margin:14px 0 0"><button class="primary" id="genBtn">${IC.play} ${t("genBtn")}</button></p>
+      <div id="genProg" style="display:none">
+        <div class="bar"><i id="genBar" style="width:4%"></i></div>
+        <p class="muted small" id="genStage" style="margin:0"></p>
+      </div>
       <p id="genMsg" aria-live="polite" style="min-height:1.2em"></p>
       ${hasBridge() ? "" : `<div class="banner warn" style="margin:12px 0 0">${t("genNeedDesktop")}</div>`}
       <div id="genList" style="margin-top:8px"></div>
@@ -713,6 +719,35 @@ document.getElementById("app").addEventListener("keydown", e => {
 /* esc() 已在被看见模块定义（模块级），此处直接复用 */
 function hasBridge(){ return !!(window.pywebview && window.pywebview.api); }
 function setGenMsg(s){ const el = document.getElementById("genMsg"); if(el) el.textContent = s; }
+/* 生成进度（D17 反馈）：JS 起步计时，Python 在真实节点推送阶段（genStagePush） */
+let genTimer = null, genT0 = 0;
+function genTick(text){
+  const el = document.getElementById("genStage"); if(!el) return;
+  const s = Math.round((Date.now() - genT0)/1000);
+  el.textContent = text + "（已等待 " + s + " 秒）";
+}
+function genProgressStart(){
+  genT0 = Date.now();
+  const wrap = document.getElementById("genProg");
+  if(wrap){ wrap.style.display = "block"; document.getElementById("genBar").style.width = "6%"; }
+  if(genTimer) clearInterval(genTimer);
+  genTick(t("genStageResearch"));
+  genTimer = setInterval(() => genTick(t("genStageResearch")), 1000);
+}
+function genStagePush(pct, text){
+  try{
+    if(genTimer){ clearInterval(genTimer); genTimer = null; }
+    const wrap = document.getElementById("genProg");
+    if(wrap){ wrap.style.display = "block"; document.getElementById("genBar").style.width = pct + "%"; }
+    genTick(text);
+    genTimer = setInterval(() => genTick(text), 1000);
+  }catch(e){}
+}
+function genProgressEnd(){
+  if(genTimer){ clearInterval(genTimer); genTimer = null; }
+  const wrap = document.getElementById("genProg");
+  if(wrap) setTimeout(() => { wrap.style.display = "none"; }, 1500);
+}
 async function refreshGenList(){
   if(!hasBridge()) return;
   try{
@@ -741,11 +776,12 @@ async function doGenerate(){
   const prof = (JSON.parse(localStorage.getItem("mhDemoV1") || "null") || {}).profile || {};
   const history = collectHistory();
   const btn = document.getElementById("genBtn");
-  btn.disabled = true; setGenMsg(t("genBusy"));
+  btn.disabled = true; genProgressStart();
   try{
     const res = await window.pywebview.api.generate(goal, days, time,
       parseFloat(prof.sleep || "7.5"), prof.stress || "mid", prof.training_experience || "none",
       prof.pain || "no", prof.motivation_style || "progress", history);
+    genProgressEnd();
     if(res && res.ok){
       setGenMsg(t("genDone"));
       refreshGenList();

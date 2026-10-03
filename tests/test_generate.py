@@ -82,6 +82,17 @@ def test_llm_generation_end_to_end() -> None:
     assert "12356" in html
 
 
+def test_progress_callback_receives_stages() -> None:
+    """D17 反馈：调研/编排/校验三段进度推给界面。"""
+    llm = ScriptedLLM([json.dumps(_research(), ensure_ascii=False),
+                       json.dumps(_valid(3), ensure_ascii=False)])
+    seen = []
+    _gen(llm).generate("增肌", FitnessPack.sample_answers(), horizon_days=3,
+                       progress=lambda p, s: seen.append((p, s)))
+    assert [p for p, _ in seen] == [10, 45, 88]
+    assert "调研完成" in seen[1][1] and "刻意练习" in seen[1][1]
+
+
 def test_research_reaches_plan_prompt() -> None:
     """D17：三本著作与失败模式必须进入计划阶段的提示词。"""
     llm = ScriptedLLM([json.dumps(_research(is_physical=False), ensure_ascii=False),

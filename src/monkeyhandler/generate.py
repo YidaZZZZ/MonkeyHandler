@@ -95,7 +95,8 @@ class InstanceGenerator:
         return user
 
     def generate(self, goal: str, answers: dict[str, str], horizon_days: int = 20,
-                 history: str = "") -> tuple[UserModel, InstanceSpec, str]:
+                 history: str = "", progress=None) -> tuple[UserModel, InstanceSpec, str]:
+        """progress: 可选回调 progress(pct:int, text:str)——调研/编排阶段推送给界面。"""
         if self.llm is None:
             raise LLMUnavailable(
                 "现在还生成不了：这台设备还没有连接 AI 服务。"
@@ -105,8 +106,15 @@ class InstanceGenerator:
         sleep = float(user.text("sleep_hours", "7.5") or 7.5)
         stress = user.text("stress_level", "mid") or "mid"
         cap = recovery_budget(sleep, stress)
+        if progress:
+            progress(10, "调研领域著作中……")
         research = self._research(goal, user)
+        if progress:
+            progress(45, f"调研完成：《{research.works[0].title}》《{research.works[1].title}》"
+                         f"《{research.works[2].title}》——编排计划中……")
         spec = self._llm_spec(user, goal, horizon_days, cap, research=research, history=history)
+        if progress:
+            progress(88, "校验依据与渲染实例中……")
         return user, spec, "llm"
 
     # ---- D17 调研阶段 -----------------------------------------------------

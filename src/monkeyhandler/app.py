@@ -78,6 +78,17 @@ class Bridge:
     # ---- 生成 ---------------------------------------------------------
     LOG_DIR = DATA_HOME / "logs"
 
+    def _push(self, pct: int, text: str) -> None:
+        """D17 生成进度推送到主窗口：调研/编排/校验分段可见。"""
+        try:
+            import webview
+            if webview.windows:
+                payload = _json.dumps(text, ensure_ascii=False)
+                webview.windows[0].evaluate_js(
+                    f"typeof genStagePush==='function' && genStagePush({int(pct)}, {payload})")
+        except Exception:
+            pass  # 推送失败不影响生成本身（进度条退化为纯计时）
+
     def generate(self, goal: str, days: int = 20, time: int = 20,
                  sleep: float = 7.5, stress: str = "mid", level: str = "none",
                  pain: str = "no", style: str = "progress", history: str = "") -> dict:
@@ -107,7 +118,8 @@ class Bridge:
             "time_budget": str(time * 7),
         }
         try:
-            user, spec, via = gen.generate(goal, answers, horizon_days=int(days), history=history)
+            user, spec, via = gen.generate(goal, answers, horizon_days=int(days), history=history,
+                                           progress=self._push)
             _log(f"生成成功：via={via} 天数={len(spec.days)}")
         except Exception as e:
             _log(f"生成失败：{type(e).__name__}: {e}")
