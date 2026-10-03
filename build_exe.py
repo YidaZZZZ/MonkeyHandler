@@ -70,7 +70,7 @@ def _stage_ui(version: str, mode: str) -> pathlib.Path:
         shutil.rmtree(stage)
     shutil.copytree(src, stage)
     if mode == "release":
-        shown = f"v{version}"
+        shown = f"v{version}（构建 {_dt.datetime.now():%Y-%m-%d %H:%M}）"
     else:
         shown = f"v{version}-dev（本地构建 {_dt.datetime.now():%Y-%m-%d %H:%M}）"
     html = (stage / "main.html").read_text(encoding="utf-8")
