@@ -41,6 +41,7 @@ h2{font-size:16.5px;margin:0 0 10px;color:#115e59;display:flex;align-items:cente
 .ex:first-child{border-top:none}
 .ex .h{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
 .ex .n{font-weight:600}.ex .d{color:var(--accent);font-size:14px;white-space:nowrap}
+.src{margin-top:4px;font-size:13px;color:var(--accent)}
 details{margin-top:5px}summary{cursor:pointer;color:var(--accent);font-size:14px}
 table{width:100%;border-collapse:collapse;font-size:14px}
 th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left}
@@ -65,7 +66,7 @@ select,input[type=text]{font:inherit;padding:8px;border:1px solid var(--line);bo
 </header>
 <main id="app"></main>
 <footer style="max-width:820px;margin:0 auto;padding:16px;color:var(--muted);font-size:13px">
-数据仅保存在本机浏览器，不上传。练习内容为通用运动常识，不构成医疗处方；脊柱侧弯的专向训练（如施罗斯疗法）需要专业评估与认证指导。
+__FOOTER_NOTE__<br>
 如果出现伤害自己的念头：心理援助热线 12356（中国，24 小时），或前往当地急诊。
 </footer>
 <script>
@@ -93,7 +94,8 @@ function render(){
     itemsHtml = items.map(it =>
       `<div class="ex"><div class="h"><span class="n">${esc(it.name)}</span><span class="d">${esc(it.dur)}</span></div>
        <div class="muted" style="font-size:14.5px">${esc(it.cue)}</div>
-       <details><summary>为什么练这个？</summary><div class="muted">${esc(it.why)}</div></details></div>`).join("");
+       <details><summary>为什么练这个？</summary><div class="muted">${esc(it.why)}</div>
+       ${it.src ? `<div class="src">依据：${esc(it.src)}</div>` : ""}</details></div>`).join("");
   }
   let banners = "";
   if(locked) banners += `<div class="banner dan"><b>安全锁定中</b>：出现过疼痛 ≥4 → 只保留前几项，停止加量；建议就医评估后再恢复。</div>`;
@@ -129,13 +131,21 @@ function render(){
     const s = r && r.done ? "✓" : (x.day === d && !graduated ? "今天" : "");
     return `<tr><td>${x.day}</td><td>${esc(x.phase)}</td><td>${esc(x.focus)}</td><td>${s}</td><td>${r&&r.done?r.rpe:"—"}</td><td>${r&&r.done?r.pain:"—"}</td></tr>`;
   }).join("");
+  const works = DATA.works || [];
+  const worksHtml = works.length ? `<h2>方法论依据 · 三本著作</h2>` +
+    works.map(w => `<div class="ex"><div class="h"><span class="n">《${esc(w.title)}》</span>
+      <span class="d">${esc(w.author || "")}${w.year ? " · " + esc(w.year) : ""}</span></div>
+      <div class="muted" style="font-size:14px">${esc(w.why)}</div>
+      ${(w.methods || []).map(m => `<div class="muted small">· ${esc(m)}</div>`).join("")}</div>`).join("") +
+    `<p class="muted small">著作与方法论要点由 AI 调研产出，未经人工审核——发现引用不实请通过「设置 → 导出全部数据」导出并反馈。</p>` : "";
   app.innerHTML = `
     <h1><span class="tag">训练平台</span><span class="tag">${esc(DATA.goal).slice(0,18)}…</span></h1>
     ${banners}
     ${body}
     <div class="card"><h2>全部日程</h2>
       <table><thead><tr><th>天</th><th>阶段</th><th>焦点</th><th>状态</th><th>RPE</th><th>疼痛</th></tr></thead><tbody>${rows}</tbody></table></div>
-    <div class="card"><h2>计划依据（可解释）</h2><p class="muted">${esc(DATA.rationale)}</p>
+    <div class="card"><h2>计划依据（可解释）</h2>${worksHtml}
+      <p class="muted">${esc(DATA.rationale)}</p>
       ${DATA.safety.map(s=>`<p class="muted small">· ${esc(s)}</p>`).join("")}</div>`;
   const sub = document.getElementById("submit");
   if(sub) sub.addEventListener("click", () => {
@@ -165,11 +175,18 @@ def render_instance(goal: str, spec: InstanceSpec, user: UserModel, via: str,
     title = f"MonkeyHandler 训练平台 · {_truncate(goal, 24)}"
     gen_date = _dt.date.today().isoformat()
     via_label = {"llm": "LLM 生成", "rule": "离线规则模板"}.get(via, via)
+    footer_note = (
+        "数据仅保存在本机浏览器，不上传。练习内容为通用运动常识，不构成医疗处方；"
+        "脊柱侧弯的专向训练（如施罗斯疗法）需要专业评估与认证指导。"
+        if spec.is_physical else
+        "数据仅保存在本机浏览器，不上传。本计划由 AI 依据页面所列著作的方法论生成，引用未经人工审核，不构成专业建议。"
+    )
     return (TEMPLATE
             .replace("__TITLE__", _html.escape(title))
             .replace("__GEN_DATE__", _html.escape(gen_date))
             .replace("__VIA__", _html.escape(via_label))
             .replace("__SLUG__", _html.escape(slug))
+            .replace("__FOOTER_NOTE__", _html.escape(footer_note))
             .replace("__DATA__", _json.dumps(data, ensure_ascii=False).replace("</", "<\\/")))
 
 
