@@ -83,6 +83,8 @@ class Bridge:
                  pain: str = "no", style: str = "progress", history: str = "") -> dict:
         import datetime as _dt2
         goal = (goal or "").strip()
+        if not goal:
+            return {"ok": False, "error": "请先写一句目标。"}
         log = self.LOG_DIR / "generate.log"
         self.LOG_DIR.mkdir(parents=True, exist_ok=True)
         def _log(msg: str) -> None:

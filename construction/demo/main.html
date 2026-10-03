@@ -482,6 +482,7 @@ document.getElementById("app").addEventListener("click", async e => {
     localStorage.setItem("mhSound", on ? "off" : "on");
     render();
   }
+  if(e.target.id === "genBtn") doGenerate();
   if(e.target.id === "exportBtn") exportAll();
 });
 async function exportAll(){
@@ -683,6 +684,8 @@ async function seeSend(){
   }
 }
 document.getElementById("app").addEventListener("click", e => {
+  if(e.target.id === "openInst2") location.href = "index.html";
+  if(e.target.id === "langToggle"){ lang = lang === "zh" ? "en" : "zh"; localStorage.setItem("mhLang", lang); render(); }
   if(e.target.id === "seeSend") seeSend();
   if(e.target.id === "seeNext"){ seeSess.idx = Math.min(seeSess.idx+1, SEE_GUIDES[lang].length-1); saveSee(); render(); }
   if(e.target.id === "seeCollapse"){ collapseOpen = !collapseOpen; cardMsg = ""; render(); }
