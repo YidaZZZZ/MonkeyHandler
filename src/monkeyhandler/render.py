@@ -42,6 +42,8 @@ h2{font-size:16.5px;margin:0 0 10px;color:#115e59;display:flex;align-items:cente
 .ex .h{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
 .ex .n{font-weight:600}.ex .d{color:var(--accent);font-size:14px;white-space:nowrap}
 .src{margin-top:4px;font-size:13px;color:var(--accent)}
+.stepLink{color:var(--ink);font-weight:600;text-decoration:underline dotted var(--accent);cursor:pointer}
+.stepLink:hover{color:var(--accent)}
 details{margin-top:5px}summary{cursor:pointer;color:var(--accent);font-size:14px}
 table{width:100%;border-collapse:collapse;font-size:14px}
 th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left}
@@ -74,6 +76,7 @@ __FOOTER_NOTE__<br>
 const DATA = __DATA__;
 const KEY = "mhInst-__SLUG__";
 let st = JSON.parse(localStorage.getItem(KEY) || "null") || {days: {}};
+let detailStep = null, curDay = 1, curItems = [];
 function save(){ localStorage.setItem(KEY, JSON.stringify(st)); }
 function esc(s){ return (s||"").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 function done(d){ return !!(st.days[d] && st.days[d].done); }
@@ -82,6 +85,7 @@ function everHighPain(){ return Object.values(st.days).some(r => r.done && r.pai
 function taper(d){ return d >= DATA.taper_from; }
 function render(){
   const app = document.getElementById("app");
+  if(detailStep){ renderDetail(); return; }
   const d = Math.min(cur(), DATA.horizon_days);
   const graduated = cur() > DATA.horizon_days;
   const locked = everHighPain();
@@ -91,11 +95,17 @@ function render(){
     let items = dayData.items;
     const lightDay = locked || DATA.intensity <= 0.5;
     if(lightDay) items = items.slice(0, Math.min(3, items.length));
-    itemsHtml = items.map(it =>
-      `<div class="ex"><div class="h"><span class="n">${esc(it.name)}</span><span class="d">${esc(it.dur)}</span></div>
+    itemsHtml = items.map((it, idx) => {
+      const hasDetail = (it.how || []).length > 0;
+      const nameHtml = hasDetail
+        ? `<a href="javascript:void(0)" class="stepLink" data-step="${idx}">${esc(it.name)}</a>`
+        : `<span class="n">${esc(it.name)}</span>`;
+      return `<div class="ex"><div class="h">${nameHtml}<span class="d">${esc(it.dur)}</span></div>
        <div class="muted" style="font-size:14.5px">${esc(it.cue)}</div>
        <details><summary>为什么练这个？</summary><div class="muted">${esc(it.why)}</div>
-       ${it.src ? `<div class="src">依据：${esc(it.src)}</div>` : ""}</details></div>`).join("");
+       ${it.src ? `<div class="src">依据：${esc(it.src)}</div>` : ""}</details></div>`;
+    }).join("");
+    curDay = d; curItems = items;
   }
   let banners = "";
   if(locked) banners += `<div class="banner dan"><b>安全锁定中</b>：出现过疼痛 ≥4 → 只保留前几项，停止加量；建议就医评估后再恢复。</div>`;
@@ -156,6 +166,30 @@ function render(){
     if(pain >= 4) setTimeout(() => alert("疼痛达到 4 分及以上：计划已停止加量。建议就医评估——这比任何进度都重要。"), 60);
   });
 }
+function renderDetail(){
+  const app = document.getElementById("app");
+  const it = detailStep.item;
+  app.innerHTML = `
+    <p><button id="backBtn">← 返回今日训练</button></p>
+    <div class="card">
+      <h1 style="margin-top:0">${esc(it.name)} <span class="tag">第 ${detailStep.day} 天</span><span class="tag">${esc(it.dur)}</span></h1>
+      ${it.cue ? `<p><b>核心要点：</b>${esc(it.cue)}</p>` : ""}
+      <h2>操作步骤</h2>
+      <ol style="padding-left:22px;margin:8px 0">${(it.how || []).map(s => `<li style="margin:8px 0">${esc(s)}</li>`).join("")}</ol>
+      ${it.mistake ? `<div class="banner warn"><b>常见错误与自检：</b>${esc(it.mistake)}</div>` : ""}
+      ${it.why ? `<p class="muted" style="font-size:14.5px"><b>为什么练这个：</b>${esc(it.why)}</p>` : ""}
+      ${it.src ? `<div class="src">依据：${esc(it.src)}</div>` : ""}
+    </div>`;
+  document.getElementById("backBtn").addEventListener("click", () => { detailStep = null; render(); });
+  window.scrollTo(0, 0);
+}
+document.getElementById("app").addEventListener("click", e => {
+  const a = e.target.closest ? e.target.closest("[data-step]") : null;
+  if(a && curItems[+a.dataset.step]){
+    detailStep = { item: curItems[+a.dataset.step], day: curDay };
+    render();
+  }
+});
 render();
 </script>
 </body>

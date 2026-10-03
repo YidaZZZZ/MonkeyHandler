@@ -29,6 +29,8 @@ class ExerciseItem(BaseModel):
     cue: str = ""
     why: str = ""
     src: str = ""  # D17：依据——《著作》要点；每个细节必须可溯源
+    how: list[str] = Field(default_factory=list)  # D18：操作步骤（3-6 步，可独立成页）
+    mistake: str = ""  # D18：新手常见错误与自检
 
 
 class DayPlan(BaseModel):
@@ -189,8 +191,11 @@ class InstanceGenerator:
             f"该领域新手常见失败模式（设计时主动规避）：{'；'.join(research.failure_modes) or '（无）'}\n\n"
             f"硬约束：\n"
             f"- intensity（整期起始强度 0-1）参考 {base:.2f}（按无经验水平），硬上限 {cap:.2f}（恢复预算）\n"
-            f"- 每天一个训练日，含 3-6 个练习项（items），每项含 name/dur/cue/why/src\n"
+            f"- 每天一个训练日，含 3-6 个练习项（items），每项含 name/dur/cue/why/src/how/mistake\n"
             f"- src ≤24 字，必须包含某本著作的书名并给出要点（例：《刻意练习》目标-反馈-小步）\n"
+            f"- how：操作步骤数组，3-6 步、每步 ≤30 字——写清身体位置/动作次序/呼吸/节奏，"
+            f"让没做过的人能照着做；认知域则写清打开什么、输入什么、产出到哪里；步骤须与 src 所引方法一致\n"
+            f"- mistake：新手最常见错误与自检方法，≤30 字\n"
             f"- 输出长度纪律（防截断）：why 每项 ≤14 字且相邻天可重复；cue ≤18 字；focus ≤16 字；rationale ≤80 字\n"
             f"- 语言纪律：所有字段用中文；phase 用中文命名（例：适应期/稳定期/巩固期）；dur 用中文格式（例：「30 分钟」）\n"
             f"- 若提供了既往执行数据：rationale 必须至少引用其中一项具体观察，并说明本期据此做了什么调整\n\n"
@@ -199,7 +204,8 @@ class InstanceGenerator:
         schema_json = (
             '{"goal": str, "horizon_days": int, "intensity": float, "rationale": str, '
             '"days": [{"day": int, "phase": str, "focus": str, '
-            '"items": [{"name": str, "dur": str, "cue": str, "why": str, "src": str}]}]}'
+            '"items": [{"name": str, "dur": str, "cue": str, "why": str, "src": str, '
+            '"how": [str], "mistake": str}]}]}'
         )
 
         def _attempt(prompt: str) -> InstanceSpec:
@@ -271,7 +277,7 @@ class InstanceGenerator:
         self._validate(spec, horizon, cap, research)
         return spec
 
-    CHUNK_DAYS = 10
+    CHUNK_DAYS = 7  # how/mistake 加入后单项输出变大，段调小防截断
 
     @staticmethod
     def _short(text: str, n: int = 140) -> str:
@@ -300,6 +306,12 @@ class InstanceGenerator:
                     raise ValueError(f"第 {x.day} 天「{it.name}」缺少依据（src）")
                 if not any(t and t in InstanceGenerator._normalize(it.src) for t in titles):
                     raise ValueError(f"第 {x.day} 天「{it.name}」的依据未引用三本著作之一")
+                # D18：操作步骤校验——没有 how 的步骤开不了详解页
+                steps = [s.strip() for s in it.how if s.strip()]
+                if not 2 <= len(steps) <= 6:
+                    raise ValueError(f"第 {x.day} 天「{it.name}」的 how 需要 2-6 步操作分解")
+                if any(len(s) > 50 for s in steps):
+                    raise ValueError(f"第 {x.day} 天「{it.name}」的 how 有步骤超过 50 字")
         # 保护文案分流（D17：理论只在适用范围内迁移——健身文案不进非身体域）
         if spec.is_physical:
             for line in ("疼痛 ≥4：停止加量并就医评估", "通用运动常识，不构成医疗处方",

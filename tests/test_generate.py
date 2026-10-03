@@ -38,7 +38,9 @@ def _valid(horizon: int, intensity: float = 0.5, src: str = "《刻意练习》�
         "goal": GOAL, "horizon_days": horizon, "intensity": intensity,
         "rationale": "测试依据：《刻意练习》目标-反馈-小步",
         "days": [{"day": i, "phase": "适应", "focus": "f",
-                  "items": [{"name": "腹式呼吸", "dur": "60 秒", "cue": "c", "why": "w", "src": src}]} for i in range(1, horizon + 1)],
+                  "items": [{"name": "腹式呼吸", "dur": "60 秒", "cue": "c", "why": "w", "src": src,
+                     "how": ["仰卧屈膝，一手放腹部", "用鼻慢吸气 4 秒，感受腹部隆起", "缩唇慢呼气 6 秒", "重复 8 次为一组"],
+                     "mistake": "常见错误：耸肩憋气；自检：呼气时腹部应缓慢下沉"}]} for i in range(1, horizon + 1)],
     }
 
 
@@ -75,7 +77,9 @@ def test_llm_generation_end_to_end() -> None:
     assert len(spec.works) == 3  # D17：调研产出附着到 spec
     assert spec.is_physical is True
     assert all(it.src for d in spec.days for it in d.items)  # 逐项依据
+    assert all(len(it.how) >= 2 for d in spec.days for it in d.items)  # D18 逐项操作步骤
     html = render_instance(goal=GOAL, spec=spec, user=user, via=via)
+    assert '"how": [' in html  # D18：操作步骤进入实例数据（入口由运行时按数据渲染）
     assert "缓解脊柱侧弯" in html
     assert "方法论依据" in html and "刻意练习" in html  # 著作卡片渲染
     assert "__DATA__" not in html
@@ -86,15 +90,18 @@ def _valid_range(a: int, b: int, intensity: float = 0.5) -> dict:
     return {"goal": GOAL, "horizon_days": 28, "intensity": intensity, "rationale": "分段依据：《刻意练习》",
             "days": [{"day": i, "phase": "适应" if i <= 10 else ("稳定" if i <= 20 else "巩固"), "focus": "f",
                       "items": [{"name": "练习", "dur": "10 分钟", "cue": "c", "why": "w",
-                                 "src": "《刻意练习》目标-反馈-小步"}]} for i in range(a, b + 1)]}
+                                 "src": "《刻意练习》目标-反馈-小步",
+                                 "how": ["明确本步的具体产出", "执行并记录用时", "对照标准自评", "调整后重做一次"],
+                                 "mistake": "常见错误：只做不自检；自检：留存产出物"}]} for i in range(a, b + 1)]}
 
 
 def test_long_horizon_chunked_generation() -> None:
     """D17：28 天计划分 3 段生成（防截断），合并后整期校验。"""
     llm = ScriptedLLM([json.dumps(_research(), ensure_ascii=False),
-                       json.dumps(_valid_range(1, 10), ensure_ascii=False),
-                       json.dumps(_valid_range(11, 20), ensure_ascii=False),
-                       json.dumps(_valid_range(21, 28), ensure_ascii=False)])
+                       json.dumps(_valid_range(1, 7), ensure_ascii=False),
+                       json.dumps(_valid_range(8, 14), ensure_ascii=False),
+                       json.dumps(_valid_range(15, 21), ensure_ascii=False),
+                       json.dumps(_valid_range(22, 28), ensure_ascii=False)])
     seen = []
     _, spec, via = _gen(llm).generate(GOAL, FitnessPack.sample_answers(), horizon_days=28,
                                       progress=lambda p, s: seen.append((p, s)))
@@ -103,12 +110,40 @@ def test_long_horizon_chunked_generation() -> None:
     assert len(spec.works) == 3
     assert all(it.src for d in spec.days for it in d.items)
     chunk_prompts = llm.calls[1:]
-    assert len(chunk_prompts) == 3
-    assert "第 11 到第 20 天" in chunk_prompts[1]
+    assert len(chunk_prompts) == 4
+    assert "第 8 到第 14 天" in chunk_prompts[1]
     assert "已生成的最后一天" in chunk_prompts[1]  # 衔接上下文
     # 分段进度推送
     texts = [s for _, s in seen]
-    assert any("第 2/3 段" in s for s in texts)
+    assert any("第 2/4 段" in s for s in texts)
+
+
+def test_how_missing_retries_then_passes() -> None:
+    """D18：操作步骤缺失会被打回重试。"""
+    import copy
+    bad = _valid(3)
+    for d in bad["days"]:
+        for it in d["items"]:
+            it["how"] = []
+    llm = ScriptedLLM([json.dumps(_research(), ensure_ascii=False),
+                       json.dumps(bad, ensure_ascii=False),
+                       json.dumps(_valid(3), ensure_ascii=False)])
+    _, spec, _ = _gen(llm).generate("增肌", FitnessPack.sample_answers(), horizon_days=3)
+    assert all(len(it.how) >= 2 for d in spec.days for it in d.items)
+    assert "how 需要 2-6 步" in llm.calls[2]
+
+
+def test_render_backward_compatible_without_how() -> None:
+    """D18：旧实例（无 how）仍可渲染，且不出现详解入口。"""
+    llm = ScriptedLLM([json.dumps(_research(), ensure_ascii=False),
+                       json.dumps(_valid(3), ensure_ascii=False)])
+    user, spec, via = _gen(llm).generate(GOAL, FitnessPack.sample_answers(), horizon_days=3)
+    for d in spec.days:
+        for it in d.items:
+            it.how = []  # 模拟旧实例数据
+    html = render_instance(goal=GOAL, spec=spec, user=user, via=via, storage_key="old1")
+    assert '"how": []' in html  # 旧实例数据无步骤 → 运行时不渲染点击入口（hasDetail 分支）
+    assert "为什么练这个" in html
 
 
 def test_progress_callback_receives_stages() -> None:
