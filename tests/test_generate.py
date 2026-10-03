@@ -82,6 +82,35 @@ def test_llm_generation_end_to_end() -> None:
     assert "12356" in html
 
 
+def _valid_range(a: int, b: int, intensity: float = 0.5) -> dict:
+    return {"goal": GOAL, "horizon_days": 28, "intensity": intensity, "rationale": "分段依据：《刻意练习》",
+            "days": [{"day": i, "phase": "适应" if i <= 10 else ("稳定" if i <= 20 else "巩固"), "focus": "f",
+                      "items": [{"name": "练习", "dur": "10 分钟", "cue": "c", "why": "w",
+                                 "src": "《刻意练习》目标-反馈-小步"}]} for i in range(a, b + 1)]}
+
+
+def test_long_horizon_chunked_generation() -> None:
+    """D17：28 天计划分 3 段生成（防截断），合并后整期校验。"""
+    llm = ScriptedLLM([json.dumps(_research(), ensure_ascii=False),
+                       json.dumps(_valid_range(1, 10), ensure_ascii=False),
+                       json.dumps(_valid_range(11, 20), ensure_ascii=False),
+                       json.dumps(_valid_range(21, 28), ensure_ascii=False)])
+    seen = []
+    _, spec, via = _gen(llm).generate(GOAL, FitnessPack.sample_answers(), horizon_days=28,
+                                      progress=lambda p, s: seen.append((p, s)))
+    assert via == "llm"
+    assert [d.day for d in spec.days] == list(range(1, 29))
+    assert len(spec.works) == 3
+    assert all(it.src for d in spec.days for it in d.items)
+    chunk_prompts = llm.calls[1:]
+    assert len(chunk_prompts) == 3
+    assert "第 11 到第 20 天" in chunk_prompts[1]
+    assert "已生成的最后一天" in chunk_prompts[1]  # 衔接上下文
+    # 分段进度推送
+    texts = [s for _, s in seen]
+    assert any("第 2/3 段" in s for s in texts)
+
+
 def test_progress_callback_receives_stages() -> None:
     """D17 反馈：调研/编排/校验三段进度推给界面。"""
     llm = ScriptedLLM([json.dumps(_research(), ensure_ascii=False),

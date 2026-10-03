@@ -92,5 +92,8 @@ class OpenAICompatClient:
         )
         with _request.urlopen(req, timeout=self.timeout) as resp:
             data = _json.loads(resp.read().decode("utf-8"))
-        content = data["choices"][0]["message"]["content"]
+        choice = data["choices"][0]
+        content = choice["message"]["content"]
+        if choice.get("finish_reason") == "length":
+            raise ValueError("模型输出被截断（finish_reason=length）——输出内容超过上限")
         return schema.model_validate_json(_strip_fences(content))
