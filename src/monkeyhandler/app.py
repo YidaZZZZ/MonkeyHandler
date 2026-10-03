@@ -184,6 +184,24 @@ def find_ui_dir() -> Path | None:
     return None
 
 
+def _window_title(ui: Path) -> str:
+    """发布版标题干净；开发版（本地构建/源码运行）显式标注——用户截图与反馈一眼可辨。
+
+    模式判定：打包产物读 ui/_buildinfo.json（build_exe.py 打桩）；无此文件时，
+    非 _MEIPASS 环境 = 源码运行 = 开发版。
+    """
+    mode = None
+    bi = ui / "_buildinfo.json"
+    if bi.exists():
+        try:
+            mode = _json.loads(bi.read_text(encoding="utf-8")).get("mode")
+        except Exception:
+            mode = None
+    if mode is None:
+        mode = "release" if getattr(sys, "_MEIPASS", None) else "dev"
+    return "MonkeyHandler" if mode == "release" else "MonkeyHandler（开发版）"
+
+
 def launch() -> str:
     """启动独立桌面窗口并阻塞至关闭；返回实际使用的启动方式。"""
     ui = find_ui_dir()
@@ -200,7 +218,7 @@ def launch() -> str:
         return "app-mode（Edge/Chrome 独立窗口）"
     storage = Path.home() / ".monkeyhandler" / "webview"
     storage.mkdir(parents=True, exist_ok=True)
-    webview.create_window("MonkeyHandler", url, js_api=Bridge(ui), width=1120, height=840)
+    webview.create_window(_window_title(ui), url, js_api=Bridge(ui), width=1120, height=840)
     webview.start(private_mode=False, storage_path=str(storage))
     return "pywebview（WebView2 原生窗口）"
 

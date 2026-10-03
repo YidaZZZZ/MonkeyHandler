@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "monkeyhandler"
-version = "0.0.1"
+version = "0.1.0"
 description = "MonkeyHandler —— AI 驱动的个体化学习/训练工作台框架：识人、识域、成案、执行闭环"
 readme = "README.md"
 requires-python = ">=3.10"
