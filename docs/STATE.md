@@ -2,7 +2,7 @@
 
 > **用途**：本文件是项目的**恢复点**（上下文恢复用；权威以仓库文档与审核门为准）——对话上下文被压缩或新会话接入时，以本文件 + git 历史 + 记忆恢复全部上下文。
 > **更新纪律**：每完成一个里程碑或重大裁决，更新本文件。
-> **最后更新**：2026-10-03（D15 批复落档；四轮质询全部闭环）
+> **最后更新**：2026-10-03（D15 批复 + exe 全流程走查完成：P0 死按钮发现并修复 8c33d6f）
 
 ## 一、产品一页纸
 
@@ -75,7 +75,7 @@
 | N5 | 2026-10-31 首次台账抽查（5 项） |
 | M1 | SQLite（数据户口落位）、计划生成器接桌面、guanzi「格」平移 |
 | 双语 | 实例界面英文（主平台已双语） |
-| exe 走查 | 第四轮外包预案必做：对 exe 实测危机路径全流程（启动/渲染/表单/危机输入/热线覆盖/纸笔回退）——未派发 |
+| exe 走查 | ✅ 2026-10-03 完成（UIA 黑盒 × USERPROFILE 隔离）：危机路径/版本行/D14 导出全通过；**发现 P0——genBtn/openInst2/langToggle 三处死按钮（无事件绑定）**，已修复并源码模式复验（8c33d6f）；**exe 重建/Release 资产更新待创始人决定**；SmartScreen 腿待真实下载场景补测。记录在 comu/走查-2026-10-03/ |
 
 ## 六、技术教训（踩过的坑）
 
@@ -87,7 +87,9 @@
 6. 本地 http.server 后台进程会在回合间死掉，浏览器测试前重启 + cache-bust；
 7. Playwright 对 sticky 头部遮挡的按钮 click 会超时——用 evaluate 内 el.click() 绕过；
 8. heredoc 传长中文脚本有截断风险——用 Write 工具写补丁脚本再执行；
-9. PyInstaller 6.22.3 兼容 Python 3.14（担忧解除）；pywebview 数据持久化需 `private_mode=False, storage_path=…`。
+9. PyInstaller 6.22.3 兼容 Python 3.14（担忧解除）；pywebview 数据持久化需 `private_mode=False, storage_path=…`；
+10. **死按钮类 bug**：渲染型界面（innerHTML 重建视图）里按钮必须走 #app 事件委托；直接 `getElementById(...).addEventListener` 只对初始视图存在的元素有效。新加按钮后用「grep id → 找 `e.target.id ===` 分支」自查一遍（走查发现 genBtn 自诞生起从未被调用）；
+11. **桌面走查方法**：exe 无法外部开 CDP（pywebview 程序化 AdditionalBrowserArguments 压掉 WEBVIEW2_* 环境变量）→ 用 PowerShell UIA 驱动真实窗口（脚本需 BOM；Chromium 可访问性要预热触碰两遍才放开；textContent 原位更新后 UIA Name 不刷新——用磁盘副作用做证据）；数据隔离用 `USERPROFILE=<tmp>` 重定向（全部数据路径派生自 `Path.home()`），真实户口零触碰。
 
 ## 七、质询记录
 
