@@ -2,7 +2,7 @@
 
 > **用途**：本文件是项目的**恢复点**（上下文恢复用；权威以仓库文档与审核门为准）——对话上下文被压缩或新会话接入时，以本文件 + git 历史 + 记忆恢复全部上下文。
 > **更新纪律**：每完成一个里程碑或重大裁决，更新本文件。
-> **最后更新**：2026-10-03（D15 批复 + exe 全流程走查完成：P0 死按钮发现并修复 8c33d6f）
+> **最后更新**：2026-10-03（D15 批复 + exe 走查完成 P0 修复 8c33d6f；重建重发 + 开发/发布构建区分 8c4a11b）
 
 ## 一、产品一页纸
 
@@ -61,7 +61,7 @@
 ## 四、桌面版使用与分发
 
 - 启动：双击 `MonkeyHandler.bat`（仓库根）或 `python -m monkeyhandler app`（pywebview 优先，Edge/Chrome --app 兜底）；
-- 打包：`python build_exe.py` → `dist/MonkeyHandler.exe`（单文件，界面内嵌 _MEIPASS/ui；--collect-all webview/pythonnet）；
+- 打包（版本号唯一来源 = pyproject.toml）：`python build_exe.py` → **开发者版** `dist/MonkeyHandler-dev.exe`（设置页版本号带 -dev+本地构建时间，窗口标题标「开发版」，不产 zip）；`python build_exe.py --release` → **发布版** `dist/MonkeyHandler.exe` + `MonkeyHandler-v<ver>-win64.zip`（Release 资产，标题/版本号干净）；源码运行（bat / python -m）标题同样标「开发版」，设置页版本号显示 v0.1.0+src；
 - 数据：`~/.monkeyhandler/`（ai.json / webview / instances / app-profile）；
 - **分发**：v0.1.0 已发布 GitHub Releases（exe + zip 含双语说明）；README 快速开始指向 Releases。
 
@@ -75,7 +75,7 @@
 | N5 | 2026-10-31 首次台账抽查（5 项） |
 | M1 | SQLite（数据户口落位）、计划生成器接桌面、guanzi「格」平移 |
 | 双语 | 实例界面英文（主平台已双语） |
-| exe 走查 | ✅ 2026-10-03 完成（UIA 黑盒 × USERPROFILE 隔离）：危机路径/版本行/D14 导出全通过；**发现 P0——genBtn/openInst2/langToggle 三处死按钮（无事件绑定）**，已修复并源码模式复验（8c33d6f）；**exe 重建/Release 资产更新待创始人决定**；SmartScreen 腿待真实下载场景补测。记录在 comu/走查-2026-10-03/ |
+| exe 走查 | ✅ 2026-10-03 完成（UIA 黑盒 × USERPROFILE 隔离）：危机路径/版本行/D14 导出全通过；**发现 P0——genBtn/openInst2/langToggle 三处死按钮（无事件绑定）**，已修复并源码模式复验（8c33d6f）；**重建重发已完成**（Release 资产已更新+说明追加重建记录；开发/发布构建区分 8c4a11b，双构建 UIA 复验通过）；SmartScreen 腿待真实下载场景补测。记录在 comu/走查-2026-10-03/ |
 
 ## 六、技术教训（踩过的坑）
 
