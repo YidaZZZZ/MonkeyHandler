@@ -62,6 +62,7 @@
 ## 四、桌面版使用与分发
 
 - 启动：双击 `MonkeyHandler.bat`（仓库根）或 `python -m monkeyhandler app`（pywebview 优先，Edge/Chrome --app 兜底）；
+- **创始人手动测试 = 运行 `dist\MonkeyHandler.exe`**（不是 bat、不是下载副本）——因此执行侧纪律：**每次源码变更后必须重建双版本并报构建时间**；创始人用设置页版本号的「（构建 …）」时间戳核对 dist 是否最新（旧构建无时间戳=10-03 22:34 之前的版本，含死按钮/白屏 bug）；重建时若 exe 被占用（创始人正开着）会 PermissionError——需先结束进程（数据在本机 localStorage，不丢）；
 - 打包（版本号唯一来源 = pyproject.toml）：`python build_exe.py` → **开发者版** `dist/MonkeyHandler-dev.exe`（设置页版本号带 -dev+本地构建时间，窗口标题标「开发版」，不产 zip）；`python build_exe.py --release` → **发布版** `dist/MonkeyHandler.exe` + `MonkeyHandler-v<ver>-win64.zip`（Release 资产，标题/版本号干净）；源码运行（bat / python -m）标题同样标「开发版」，设置页版本号显示 v0.1.0+src；
 - 数据：`~/.monkeyhandler/`（ai.json / webview / instances / app-profile）；
 - **分发**：v0.1.0 已发布 GitHub Releases（exe + zip 含双语说明）；README 快速开始指向 Releases。
