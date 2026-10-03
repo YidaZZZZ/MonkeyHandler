@@ -138,7 +138,14 @@ class Bridge:
         return {"instances": []}
 
     def list_instances(self) -> dict:
-        return {"instances": self._manifest()["instances"]}
+        out = []
+        for x in self._manifest()["instances"]:
+            f = self.instances_dir / x.get("file", "")
+            item = dict(x)
+            # uri 不能只依赖 manifest——文件可能不在（plan-2fe679 误删教训）；按磁盘现状给，缺失给空串由界面标注
+            item["uri"] = f.as_uri() if f.exists() else ""
+            out.append(item)
+        return {"instances": out}
 
     def export_data(self, data_json: str) -> dict:
         """N13/D14：把页面汇总的导出 JSON 落到数据户口 exports/。"""
@@ -149,6 +156,9 @@ class Bridge:
         return {"ok": True, "path": str(path)}
 
     def open_uri(self, uri: str) -> None:
+        # 空/非法 uri 会落到 pywebview 的内置空白页（实例白屏根因）——直接拒之门外
+        if not uri or not str(uri).startswith(("file:", "http:", "https:")):
+            return
         import webview
         if len(webview.windows) < 6:
             webview.create_window("MonkeyHandler · 训练平台", uri, width=1000, height=820)

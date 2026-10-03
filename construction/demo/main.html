@@ -720,11 +720,15 @@ async function refreshGenList(){
     const el = document.getElementById("genList");
     if(!el) return;
     const list = (res && res.instances) || [];
-    el.innerHTML = list.length ? list.map(x =>
-      `<div class="inst" style="border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:8px 0">
+    el.innerHTML = list.length ? list.map(x => {
+      const missing = !x.uri;
+      return `<div class="inst" style="border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:8px 0">
         <div class="info"><div class="name">${esc(x.goal)}</div>
-        <span class="muted small">${esc(x.created)} · ${x.horizon} 天</span></div>
-        <button class="open" data-uri="${esc(x.uri)}">${lang==="zh"?"打开":"Open"}</button></div>`).join("")
+        <span class="muted small">${esc(x.created)} · ${x.horizon} 天${missing ? (lang==="zh" ? " · <b>实例文件缺失</b>" : " · <b>instance file missing</b>") : ""}</span></div>
+        ${missing
+          ? `<button class="open" disabled title="${lang==="zh"?"实例文件不存在，无法打开":"instance file not found"}">${lang==="zh"?"打开":"Open"}</button>`
+          : `<button class="open" data-uri="${esc(x.uri)}">${lang==="zh"?"打开":"Open"}</button>`}</div>`;
+    }).join("")
       : `<p class="muted small">${t("genListEmpty")}</p>`;
   }catch(e){ /* 桥不可用（浏览器模式）时静默 */ }
 }
@@ -754,7 +758,7 @@ async function doGenerate(){
 }
 document.addEventListener("click", e => {
   const b = e.target.closest && e.target.closest("[data-uri]");
-  if(b && hasBridge()) window.pywebview.api.open_uri(b.dataset.uri);
+  if(b && hasBridge() && b.dataset.uri) window.pywebview.api.open_uri(b.dataset.uri);
 });
 render();
 </script>
