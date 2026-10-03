@@ -1,7 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import collect_all
 
-datas = [('E:/360MoveData/Users/guess/Desktop/workathome/AI_mytry/Z_code/Pokemon_trainer/build/ui-stage-release', 'ui')]
+datas = [('E:/360MoveData/Users/guess/Desktop/workathome/AI_mytry/Z_code/Pokemon_trainer/build/ui-stage-dev', 'ui')]
 binaries = []
 hiddenimports = ['clr', 'monkeyhandler', 'monkeyhandler.app', 'monkeyhandler.cli']
 tmp_ret = collect_all('webview')
@@ -31,7 +31,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='MonkeyHandler',
+    name='MonkeyHandler-dev',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
